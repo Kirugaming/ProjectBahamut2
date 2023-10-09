@@ -4,11 +4,13 @@
 
 #include "window.h"
 
+// SDL Rendering is for Engine UI,
+// OpenGL is for game rendering and game ui and what not
+
 int main(int argc, char *argv[]) {
     if (initWindow() == -1) {
         return -1;
     }
-
 
     glViewport(0, 0, winWidth, winHeight);
     while(!quit){
@@ -20,11 +22,16 @@ int main(int argc, char *argv[]) {
         SDL_GL_SwapWindow(window);
     }
 
+    // cleanup
+    SDL_GL_DeleteContext(glContext);
     SDL_DestroyWindow( window );
     SDL_Quit();
     return 0;
 }
 
+/*
+ * Startup SDL rendering and OpenGL rendering
+ */
 int initWindow() {
     // Init SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -44,7 +51,7 @@ int initWindow() {
     SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
     SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 6 );
     SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
-    SDL_GL_CreateContext(window);
+    glContext = SDL_GL_CreateContext(window);
     // Init Glad
     if (!gladLoadGLLoader(SDL_GL_GetProcAddress)) {
         std::cout << "Glad failed to Initialize!" << std::endl;
@@ -55,7 +62,6 @@ int initWindow() {
 }
 
 void windowEvents() {
-    SDL_Event e;
     while( SDL_PollEvent( &e ) ) {
         if( e.type == SDL_QUIT ) {
             quit = true;

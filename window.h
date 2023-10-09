@@ -5,7 +5,7 @@
 #ifndef PROJECTBAHAMUT_WINDOW_H
 #define PROJECTBAHAMUT_WINDOW_H
 
-
+#define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <glad/glad.h>
 #include <iostream>
@@ -17,7 +17,10 @@ int winHeight;
 SDL_DisplayMode displayMode;
 SDL_Window* window = nullptr;
 SDL_Surface* surface = nullptr;
+SDL_GLContext glContext = nullptr;
+SDL_Event e;
 
+int main(int argc, char *argv[]);
 int initWindow();
 void windowEvents();
 

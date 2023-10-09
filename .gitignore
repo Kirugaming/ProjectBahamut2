@@ -23,6 +23,10 @@ _deps
 /cmake-build-debug/
 /include/
 /SDL2/
+/SDL2_image/
+/glm/
+/assimp/
 
 # exclude files
 glad.c
+stb_image.h
