@@ -26,7 +26,7 @@ void Mesh::draw(Shader &shader) {
         } else if (name == "texture_specular") {
             number = std::to_string(specularNr++);
         }
-        shader.setInt(("material." + name + number).c_str(), i);
+        shader.setInt(name + number, i);
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
     glActiveTexture(GL_TEXTURE0);
@@ -44,10 +44,13 @@ void Mesh::setupMesh() {
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
+    size_t vertexInBytes = vertices.size() * sizeof(Vertex);
+
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertexInBytes), &vertices[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(indices.size() * sizeof(unsigned int)), &indices[0], GL_STATIC_DRAW);
+
 
     // vertex positions
     glEnableVertexAttribArray(0);

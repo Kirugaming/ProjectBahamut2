@@ -8,8 +8,8 @@ set(CMAKE_CXX_STANDARD 14)
 
 
 # Must set the path to the main.cpp, for example: scripts/main.cpp if it is inside a folder
-set(SOURCE_FILES window.cpp window.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp Model.h)
-set(LIB_FILES stb_image.h glad.c)
+set(SOURCE_FILES window.cpp window.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp Model.h Transformation.cpp Transformation.h GameObject.cpp GameObject.h)
+set(LIB_FILES glad.c)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${LIB_FILES})
 
 # SDL2
@@ -27,6 +27,9 @@ target_link_libraries(${PROJECT_NAME} ${SDL2_IMAGE_LIBRARIES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE include/)
 
+# stb
+include_directories(${PROJECT_NAME} PRIVATE lib/stb)
+
 # assimp
 set(BUILD_SHARED_LIBS ON)
 add_subdirectory("lib/assimp/")
@@ -36,3 +39,5 @@ target_link_libraries(${PROJECT_NAME} assimp::assimp)
 add_subdirectory("lib/glm/")
 target_link_libraries(${PROJECT_NAME} glm)
 
+# TODO: copy SDL2.dll and assimpd.dll to build folder
+# TODO: copy shader files to build folder

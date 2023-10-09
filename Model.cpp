@@ -4,6 +4,11 @@
 
 #include "Model.h"
 
+#ifndef STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#endif
+
 
 void Model::draw(Shader &shader) {
     for (auto & mesh : meshes) {
@@ -80,7 +85,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     }
 
-    return Mesh(vertices, indices, textures);
+    return {vertices, indices, textures};
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName) {
@@ -92,6 +97,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
         texture.id = TextureFromFile(str.C_Str(), directory);
         texture.type = typeName;
         texture.path = str.C_Str();
+        std::cout << texture.id << " " << texture.type << std::endl;
         textures.push_back(texture);
     }
     return textures;

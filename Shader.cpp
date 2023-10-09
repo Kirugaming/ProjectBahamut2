@@ -4,11 +4,11 @@
 
 #include "Shader.h"
 
-Shader::Shader() : Shader("Assets/shaders/shader.vert", "Assets/shaders/shader.frag") {}
+Shader::Shader() : Shader("shaders/shader.vert", "shaders/shader.frag") {}
 
 Shader::Shader(const std::string &vertSource, const std::string &fragSource) {
-    const char* vertCode;
-    const char* fragCode;
+    std::string vertCode;
+    std::string fragCode;
     std::ifstream vertFile;
     std::ifstream fragFile;
     // exception
@@ -18,30 +18,34 @@ Shader::Shader(const std::string &vertSource, const std::string &fragSource) {
     // load glsl code from text file
     try {
         std::stringstream vertStream, fragStream;
-        // vertex
         vertFile.open(vertSource);
-        vertStream << vertFile.rdbuf();
-        vertFile.close();
-        vertCode = vertStream.str().c_str();
-        // fragment
         fragFile.open(fragSource);
+
+        vertStream << vertFile.rdbuf();
         fragStream << fragFile.rdbuf();
+
+        vertFile.close();
         fragFile.close();
-        fragCode = fragStream.str().c_str();
+
+        vertCode = vertStream.str();
+        fragCode = fragStream.str();
     } catch (std::exception &exception) {
         std::cout << "SHADER CODE FAILED TO LOAD! \n" << exception.what() << std::endl;
     }
+
+    const char* vCode = vertCode.c_str();
+    const char* fCode = fragCode.c_str();
 
     // compile glsl code
     unsigned int vertex, fragment;
 
     vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vertCode, nullptr);
+    glShaderSource(vertex, 1, &vCode, nullptr);
     glCompileShader(vertex);
     getShaderCompileInfoLog(vertex);
 
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &fragCode, nullptr);
+    glShaderSource(fragment, 1, &fCode, nullptr);
     glCompileShader(fragment);
     getShaderCompileInfoLog(fragment);
 
@@ -61,11 +65,19 @@ Shader::Shader(const std::string &vertSource, const std::string &fragSource) {
     glDeleteShader(fragment);
 }
 
+void Shader::use() const {
+    glUseProgram(this->programId);
+}
+void Shader::unUse() const {
+    glUseProgram(0);
+}
+
+
 void Shader::setInt(const std::string &name, int value) const
 {
     glUniform1i(glGetUniformLocation(this->programId, name.c_str()), value);
 }
-void Shader::editShaderWithMat4(const char *uniformName, glm::mat4 &matrix) const {
+void Shader::editShaderWithMat4(const char *uniformName, glm::mat4 matrix) const {
     glUniformMatrix4fv(glGetUniformLocation(this->programId, uniformName), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 void Shader::editShaderWithVec3(const char *uniformName, glm::vec3 &colors) const {
@@ -78,7 +90,7 @@ void Shader::getShaderProgramLinkInfoLog(unsigned int shaderProgramID) {
     glGetProgramiv(shaderProgramID, GL_LINK_STATUS, &success);
     if(!success) {
         glGetProgramInfoLog(shaderProgramID, 512, nullptr, infoLog);
-        std::cout << "Shader program failed to link! - " << infoLog << std::endl;
+        std::cout << "Shader program failed to link! - \n" << infoLog << std::endl;
     }
 }
 void Shader::getShaderCompileInfoLog(unsigned int shaderID) {
@@ -91,3 +103,4 @@ void Shader::getShaderCompileInfoLog(unsigned int shaderID) {
         std::cout << "Shader failed to compile! - " << infoLog << std::endl;
     }
 }
+
