@@ -5,8 +5,6 @@ set(CMAKE_CXX_STANDARD 14)
 
 
 
-
-
 # Must set the path to the main.cpp, for example: scripts/main.cpp if it is inside a folder
 set(SOURCE_FILES window.cpp window.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp Model.h Transformation.cpp Transformation.h GameObject.cpp GameObject.h)
 set(LIB_FILES glad.c)

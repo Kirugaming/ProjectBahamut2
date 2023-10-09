@@ -60,10 +60,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         vertex.normals = vector;
 
         if (mesh->mTextureCoords[0]) {
-            glm::vec2 vec;
-            vec.x = mesh->mTextureCoords[0][i].x;
-            vec.y = mesh->mTextureCoords[0][i].y;
-            vertex.texCoords = vec;
+            vertex.texCoords = glm::vec2(mesh->mTextureCoords[0][i].x,mesh->mTextureCoords[0][i].y);
         } else {
             vertex.texCoords = glm::vec2(0.0f, 0.0f);
         }
@@ -97,7 +94,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
         texture.id = TextureFromFile(str.C_Str(), directory);
         texture.type = typeName;
         texture.path = str.C_Str();
-        std::cout << texture.id << " " << texture.type << std::endl;
+        std::cout << texture.id << " " << texture.type << "\n" <<  texture.path << std::endl;
         textures.push_back(texture);
     }
     return textures;

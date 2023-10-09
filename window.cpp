@@ -5,6 +5,7 @@
 #include "window.h"
 #include "GameObject.h"
 
+
 // SDL Rendering is for Engine UI,
 // OpenGL is for game rendering and game ui and what not
 
@@ -14,10 +15,14 @@ int main(int argc, char *argv[]) {
     }
 
     glViewport(0, 0, winWidth, winHeight);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     auto* model = new GameObject("Raphtalia", Model("raph/raph.obj"));
 
     model->transform.position = glm::vec3(0.0f, -0.5f, 0.0f);
+    model->transform.rotation = glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0f));
+
 
     while(!quit){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
