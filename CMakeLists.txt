@@ -10,26 +10,19 @@ set(SOURCE_FILES window.cpp window.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.c
 set(LIB_FILES glad.c)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${LIB_FILES})
 
-# SDL2
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
-set(SDL2_PATH "SDL2/x86_64-w64-mingw32")
-set(SDL2_IMAGE_PATH "SDL2_image/x86_64-w64-mingw32")
 
-find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIR})
-target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY})
-
-find_package(SDL2_image REQUIRED)
-include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} ${SDL2_IMAGE_LIBRARIES})
+set(BUILD_SHARED_LIBS ON)
 
 target_include_directories(${PROJECT_NAME} PRIVATE include/)
+
+# SDL
+add_subdirectory("lib/SDL2/")
+target_link_libraries(${PROJECT_NAME} SDL2::SDL2)
 
 # stb
 include_directories(${PROJECT_NAME} PRIVATE lib/stb)
 
 # assimp
-set(BUILD_SHARED_LIBS ON)
 add_subdirectory("lib/assimp/")
 target_link_libraries(${PROJECT_NAME} assimp::assimp)
 
@@ -37,5 +30,24 @@ target_link_libraries(${PROJECT_NAME} assimp::assimp)
 add_subdirectory("lib/glm/")
 target_link_libraries(${PROJECT_NAME} glm)
 
-# TODO: copy SDL2.dll and assimpd.dll to build folder
-# TODO: copy shader files to build folder
+
+# Copy Needed DLLs to build
+set(lib_dlls
+        ${PROJECT_BINARY_DIR}/lib/assimp/bin/assimpd.dll
+        ${PROJECT_BINARY_DIR}/lib/SDL2/SDL2d.dll
+        )
+add_custom_command(
+        TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "Copying DLLs to build directory"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${lib_dlls} ${PROJECT_BINARY_DIR} > copy_dlls.log 2>&1
+        COMMENT "Copying DLLs to build directory"
+)
+
+# Copy Shader files to build
+add_custom_command(TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "Copying Shaders to build directory"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/shaders ${PROJECT_BINARY_DIR}/shaders > copy_shaders.log 2>&1
+        COMMENT "Copying Shaders to build directory")

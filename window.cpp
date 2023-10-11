@@ -58,7 +58,7 @@ int initWindow() {
     winHeight = (displayMode.h-50)/1.1;
 
     window = SDL_CreateWindow("ProjectBahamut", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, winWidth, winHeight,
-                              SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+                              SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_MAXIMIZED);
 
     // opengl
     SDL_GL_LoadLibrary(nullptr);
@@ -67,7 +67,7 @@ int initWindow() {
     SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
     glContext = SDL_GL_CreateContext(window);
     // Init Glad
-    if (!gladLoadGLLoader(SDL_GL_GetProcAddress)) {
+    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(SDL_GL_GetProcAddress))) {
         std::cout << "Glad failed to Initialize!" << std::endl;
         return -1;
     }
