@@ -94,7 +94,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
         texture.id = TextureFromFile(str.C_Str(), directory);
         texture.type = typeName;
         texture.path = str.C_Str();
-        std::cout << texture.id << " " << texture.type << "\n" <<  texture.path << std::endl;
+
         textures.push_back(texture);
     }
     return textures;

@@ -14,9 +14,10 @@ GameObject::GameObject(std::string name, Model model) : shader(), name(std::move
 void GameObject::draw() {
     shader.use();
 
+    // apply transformations
     this->shader.editShaderWithMat4("model", transform.toMat4());
 
     model.draw(shader);
 
-    //shader.unUse();
+    shader.unUse();
 }
