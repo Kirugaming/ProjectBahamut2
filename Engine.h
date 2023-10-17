@@ -27,6 +27,7 @@ public:
     SDL_DisplayMode displayMode;
     SDL_Window *window = nullptr;
     SDL_GLContext glContext = nullptr;
+    const Uint8 *keys = SDL_GetKeyboardState(nullptr);
 
     bool rightMouseButtonPressed = false;
     int initialMouseX = 0;
@@ -46,7 +47,7 @@ private:
     int initRendering(int winHeight, int winWidth); // SDL and OpenGL
     void eventMonitor();
 
-    void KeyboardInput(SDL_KeyboardEvent event);
+    void KeyboardInput();
 };
 
 

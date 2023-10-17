@@ -16,7 +16,7 @@ Engine::Engine() {
     // init engine ui
 
     // init game
-    game.camera = Camera(glm::vec3(0.0f, 1.5f, 2.0f));
+    game.camera = Camera(glm::vec3(0.0f, 1.0f, 2.0f));
 
     auto* model = new GameObject("Raphtalia", Model("raph/raph.obj"));
 
@@ -59,7 +59,9 @@ int Engine::initRendering(int winHeight, int winWidth) {
 void Engine::engineLoop() {
 
     while(!game.quit){
+        SDL_PumpEvents();
         eventMonitor(); // query SDL events
+        KeyboardInput();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -71,9 +73,7 @@ void Engine::engineLoop() {
         game.lastFrame = now;
 
 
-        // TODO: CAMERA UPDATE TO SHADER
         for (GameObject* model : game.models) {
-
             model->draw(game.camera.getView());
         }
 
@@ -97,9 +97,6 @@ void Engine::eventMonitor() {
                         break;
                 }
                 break;
-            case SDL_KEYDOWN:
-                KeyboardInput(e.key);
-                break;
         }
     }
 }
@@ -111,32 +108,29 @@ Engine::~Engine() {
     SDL_Quit();
 }
 
-void Engine::KeyboardInput(SDL_KeyboardEvent keyEvent) {
-    switch (keyEvent.keysym.scancode) {
-        case SDL_SCANCODE_W:
-            game.camera.movement(Camera::FORWARD, game.deltaTime);
-            break;
-        case SDL_SCANCODE_S:
-            game.camera.movement(Camera::BACKWARD, game.deltaTime);
-            break;
-        case SDL_SCANCODE_A:
-            game.camera.movement(Camera::LEFT, game.deltaTime);
-            break;
-        case SDL_SCANCODE_D:
-            game.camera.movement(Camera::RIGHT, game.deltaTime);
-            break;
-        case SDL_SCANCODE_UP:
-            game.camera.setPitch(1);
-            break;
-        case SDL_SCANCODE_DOWN:
-            game.camera.setPitch(-1);
-            break;
-        case SDL_SCANCODE_LEFT:
-            game.camera.setYaw(-1);
-            break;
-        case SDL_SCANCODE_RIGHT:
-            game.camera.setYaw(1);
-            break;
+void Engine::KeyboardInput() { // possible to do this elsewhere but its here for now
+    if (keys[SDL_SCANCODE_W]) {
+        game.camera.movement(Camera::FORWARD, game.deltaTime);
+    }
+    if (keys[SDL_SCANCODE_S]) {
+        game.camera.movement(Camera::BACKWARD, game.deltaTime);
+    }
+    if (keys[SDL_SCANCODE_A]) {
+        game.camera.movement(Camera::LEFT, game.deltaTime);
+    }
+    if (keys[SDL_SCANCODE_D]) {
+        game.camera.movement(Camera::RIGHT, game.deltaTime);
+    }
+    if (keys[SDL_SCANCODE_UP]) {
+        game.camera.setPitch(1);
+    }
+    if (keys[SDL_SCANCODE_DOWN]) {
+        game.camera.setPitch(-1);
+    }
+    if (keys[SDL_SCANCODE_LEFT]) {
+        game.camera.setYaw(-1);
+    }
+    if (keys[SDL_SCANCODE_RIGHT]) {
+        game.camera.setYaw(1);
     }
 }
-// TODO: MOUSE
