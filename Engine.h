@@ -9,6 +9,7 @@
 
 
 #include <vector>
+#include <chrono>
 #include "Camera.h"
 #include "GameObject.h"
 #include "SDL.h"
@@ -16,7 +17,8 @@
 struct Game {
     bool quit;
     Camera camera;
-    float deltaTime;
+    float deltaTime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    std::chrono::time_point<std::chrono::steady_clock> lastFrame;
     std::vector<GameObject*> models;
 };
 
@@ -25,21 +27,26 @@ public:
     SDL_DisplayMode displayMode;
     SDL_Window *window = nullptr;
     SDL_GLContext glContext = nullptr;
-    SDL_Event e;
+
+    bool rightMouseButtonPressed = false;
+    int initialMouseX = 0;
+    int initialMouseY = 0;
 
     Game game;
     // Dear Imgui to be implemented
     Engine();
     ~Engine();
 
-    void eventMonitor();
-    void engineLoop();
 
+    void engineLoop();
 
 
 
 private:
     int initRendering(int winHeight, int winWidth); // SDL and OpenGL
+    void eventMonitor();
+
+    void KeyboardInput(SDL_KeyboardEvent event);
 };
 
 

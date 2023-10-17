@@ -9,6 +9,7 @@
 #include <string>
 #include "Model.h"
 #include "Transformation.h"
+#include "Camera.h"
 
 class GameObject {
 public:
@@ -22,6 +23,10 @@ public:
     GameObject(std::string name, Model model);
 
     void draw();
+
+    void draw(Camera camera);
+
+    void draw(glm::mat4 cameraView);
 };
 
 

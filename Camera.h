@@ -36,8 +36,12 @@ public:
     void movement(Input direction, float deltaTime);
     void mouseLook(float mouseX, float mouseY);
 
+    void setPitch(float offset);
+    void setYaw(float offset);
 private:
     void updateCameraVectors();
+
+
 };
 
 

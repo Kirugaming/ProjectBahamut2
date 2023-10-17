@@ -11,10 +11,12 @@ GameObject::GameObject(std::string name, Model model) : shader(), name(std::move
     transform = Transform();
 }
 
-void GameObject::draw() {
+void GameObject::draw(glm::mat4 cameraView) {
     shader.use();
 
     // apply transformations
+    this->shader.editShaderWithMat4("view", cameraView);
+    this->shader.editShaderWithMat4("perspective", glm::perspective(glm::radians(45.0f), (float)640 / (float)480, 0.1f, 100.0f));
     this->shader.editShaderWithMat4("model", transform.toMat4());
 
     model.draw(shader);

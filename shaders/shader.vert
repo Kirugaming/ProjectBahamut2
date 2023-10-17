@@ -6,8 +6,10 @@ layout (location = 2) in vec2 inTexCoords;
 out vec2 texCoords;
 
 uniform mat4 model;
+uniform mat4 view;
+uniform mat4 perspective;
 
 void main() {
     texCoords = inTexCoords;
-    gl_Position = model * vec4(inPos, 1.0);
+    gl_Position = perspective * view * model * vec4(inPos, 1.0);
 }

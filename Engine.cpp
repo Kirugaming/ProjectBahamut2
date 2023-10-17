@@ -19,8 +19,7 @@ Engine::Engine() {
     game.camera = Camera(glm::vec3(0.0f, 1.5f, 2.0f));
 
     auto* model = new GameObject("Raphtalia", Model("raph/raph.obj"));
-    model->transform.position = glm::vec3(0.0f, -0.5f, 0.0f);
-    model->transform.rotation = glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0f));
+
     game.models.push_back(model);
 }
 
@@ -58,6 +57,7 @@ int Engine::initRendering(int winHeight, int winWidth) {
 }
 
 void Engine::engineLoop() {
+
     while(!game.quit){
         eventMonitor(); // query SDL events
 
@@ -65,8 +65,16 @@ void Engine::engineLoop() {
 
         glClearColor(.2f, .3f, .3f, 1.0f);
 
+        // delta time
+        auto now = std::chrono::steady_clock::now();
+        game.deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - game.lastFrame).count() / 1000.0f;
+        game.lastFrame = now;
+
+
+        // TODO: CAMERA UPDATE TO SHADER
         for (GameObject* model : game.models) {
-            model->draw();
+
+            model->draw(game.camera.getView());
         }
 
 
@@ -76,11 +84,22 @@ void Engine::engineLoop() {
 
 
 void Engine::eventMonitor() {
+    SDL_Event e;
     while( SDL_PollEvent( &e ) ) {
-        if( e.type == SDL_QUIT ) {
-            game.quit = true;
-        } else if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_RESIZED) { // Resize OpenGL context
-            glViewport(0, 0, e.window.data1, e.window.data2);
+        switch (e.type) {
+            case SDL_QUIT:
+                game.quit = true;
+                break;
+            case SDL_WINDOWEVENT:
+                switch (e.window.event) {
+                    case SDL_WINDOWEVENT_RESIZED:
+                        glViewport(0, 0, e.window.data1, e.window.data2);
+                        break;
+                }
+                break;
+            case SDL_KEYDOWN:
+                KeyboardInput(e.key);
+                break;
         }
     }
 }
@@ -91,3 +110,33 @@ Engine::~Engine() {
     SDL_DestroyWindow( window );
     SDL_Quit();
 }
+
+void Engine::KeyboardInput(SDL_KeyboardEvent keyEvent) {
+    switch (keyEvent.keysym.scancode) {
+        case SDL_SCANCODE_W:
+            game.camera.movement(Camera::FORWARD, game.deltaTime);
+            break;
+        case SDL_SCANCODE_S:
+            game.camera.movement(Camera::BACKWARD, game.deltaTime);
+            break;
+        case SDL_SCANCODE_A:
+            game.camera.movement(Camera::LEFT, game.deltaTime);
+            break;
+        case SDL_SCANCODE_D:
+            game.camera.movement(Camera::RIGHT, game.deltaTime);
+            break;
+        case SDL_SCANCODE_UP:
+            game.camera.setPitch(1);
+            break;
+        case SDL_SCANCODE_DOWN:
+            game.camera.setPitch(-1);
+            break;
+        case SDL_SCANCODE_LEFT:
+            game.camera.setYaw(-1);
+            break;
+        case SDL_SCANCODE_RIGHT:
+            game.camera.setYaw(1);
+            break;
+    }
+}
+// TODO: MOUSE
