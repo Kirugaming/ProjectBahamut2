@@ -13,6 +13,7 @@
 #include "Camera.h"
 #include "GameObject.h"
 #include "SDL.h"
+#include "imgui.h"
 
 struct Game {
     bool quit;
@@ -27,6 +28,7 @@ public:
     SDL_DisplayMode displayMode;
     SDL_Window *window = nullptr;
     SDL_GLContext glContext = nullptr;
+    SDL_Event *event;
     const Uint8 *keys = SDL_GetKeyboardState(nullptr);
 
     bool rightMouseButtonPressed = false;
@@ -45,6 +47,7 @@ public:
 
 private:
     int initRendering(int winHeight, int winWidth); // SDL and OpenGL
+    int initEngineUI();
     void eventMonitor();
 
     void KeyboardInput();

@@ -3,18 +3,30 @@ project(ProjectBahamut)
 
 set(CMAKE_CXX_STANDARD 14)
 
+# imgui
+set(IMGUI_SOURCES lib/imgui/imgui.cpp
+        lib/imgui/imgui_demo.cpp
+        lib/imgui/imgui_draw.cpp
+        lib/imgui/imgui_tables.cpp
+        lib/imgui/imgui_widgets.cpp
+        lib/imgui/backends/imgui_impl_opengl3.cpp
+        lib/imgui/backends/imgui_impl_sdl2.cpp
+        lib/imgui/backends/imgui_impl_sdlrenderer2.cpp)
 
+include_directories(lib/imgui)
 
 # Must set the path to the main.cpp, for example: scripts/main.cpp if it is inside a folder
 set(SOURCE_FILES main.cpp main.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp Model.h Transformation.cpp Transformation.h GameObject.cpp GameObject.h Camera.cpp Camera.h Engine.h Engine.cpp)
 set(LIB_FILES glad.c)
-add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${LIB_FILES})
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${LIB_FILES} ${IMGUI_SOURCES})
 
 
 # include libraries with the project
 set(BUILD_SHARED_LIBS ON)
 
 target_include_directories(${PROJECT_NAME} PRIVATE include/)
+
+
 
 # SDL
 add_subdirectory("lib/SDL2/")

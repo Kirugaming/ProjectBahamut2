@@ -3,6 +3,8 @@
 //
 
 #include "Engine.h"
+#include "backends/imgui_impl_sdl2.h"
+#include "backends/imgui_impl_opengl3.h"
 
 
 Engine::Engine() {
@@ -14,6 +16,7 @@ Engine::Engine() {
     }
 
     // init engine ui
+    initEngineUI();
 
     // init game
     game.camera = Camera(glm::vec3(0.0f, 1.0f, 2.0f));
@@ -57,26 +60,40 @@ int Engine::initRendering(int winHeight, int winWidth) {
 }
 
 void Engine::engineLoop() {
-
     while(!game.quit){
-        SDL_PumpEvents();
-        eventMonitor(); // query SDL events
-        KeyboardInput();
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-        glClearColor(.2f, .3f, .3f, 1.0f);
-
         // delta time
         auto now = std::chrono::steady_clock::now();
         game.deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - game.lastFrame).count() / 1000.0f;
         game.lastFrame = now;
 
 
+        // Events
+        SDL_PumpEvents();
+        eventMonitor(); // query SDL events
+        KeyboardInput();
+
+
+
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+        ImGui::ShowDemoWindow(); // Show demo window! :)
+
+        ImGui::Begin("Hello World!");
+        ImGui::Text("Hello World!");
+        ImGui::End();
+
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glClearColor(.2f, .3f, .3f, 1.0f);
+
         for (GameObject* model : game.models) {
             model->draw(game.camera.getView());
         }
 
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         SDL_GL_SwapWindow(window);
     }
@@ -84,16 +101,16 @@ void Engine::engineLoop() {
 
 
 void Engine::eventMonitor() {
-    SDL_Event e;
-    while( SDL_PollEvent( &e ) ) {
-        switch (e.type) {
+    while( SDL_PollEvent( event ) ) {
+        ImGui_ImplSDL2_ProcessEvent(event); // Forward your event to backend
+        switch (event->type) {
             case SDL_QUIT:
                 game.quit = true;
                 break;
             case SDL_WINDOWEVENT:
-                switch (e.window.event) {
+                switch (event->window.event) {
                     case SDL_WINDOWEVENT_RESIZED:
-                        glViewport(0, 0, e.window.data1, e.window.data2);
+                        glViewport(0, 0, event->window.data1, event->window.data2);
                         break;
                 }
                 break;
@@ -102,6 +119,9 @@ void Engine::eventMonitor() {
 }
 
 Engine::~Engine() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
     // cleanup
     SDL_GL_DeleteContext(glContext);
     SDL_DestroyWindow( window );
@@ -133,4 +153,17 @@ void Engine::KeyboardInput() { // possible to do this elsewhere but its here for
     if (keys[SDL_SCANCODE_RIGHT]) {
         game.camera.setYaw(1);
     }
+}
+
+int Engine::initEngineUI() {
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplSDL2_InitForOpenGL(window, glContext);
+    ImGui_ImplOpenGL3_Init();
+
+    return 0;
 }
