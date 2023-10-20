@@ -9,12 +9,18 @@ Level::Level(const std::string& levelFile) {
         YAML::Node level = YAML::LoadFile(levelFile);
         
         // go through game objects
-        for (int i = 0; i < level["GameObjects"].size(); ++i) {
+        for (auto &&object : level["GameObjects"]) {
             gameObjects.push_back(
                     new GameObject(
-                            level["GameObjects"][i]["name"].as<std::string>(),
-                        level["GameObjects"][i]["model"].as<std::string>())
-                    );
+                            object["name"].as<std::string>(),
+                            object["model"].as<std::string>(),
+                            glm::vec3(object["position"][0].as<float>(), object["position"][1].as<float>(), object["position"][2].as<float>())
+                    )
+            );
+        }
+        for (int i = 0; i < level["GameObjects"].size(); ++i) {
+            YAML::Node object = level["GameObjects"][i];
+
         }
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;

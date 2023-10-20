@@ -11,6 +11,11 @@ GameObject::GameObject(std::string name, const std::string& modelPath) : shader(
     transform = Transform();
 }
 
+GameObject::GameObject(std::string name, const std::string &modelPath, glm::vec3 position) : shader(), name(std::move(name)),  model(*new Model(modelPath.c_str())) {
+    transform = Transform();
+    transform.position = position;
+}
+
 void GameObject::draw(glm::mat4 cameraView) {
     shader.use();
 
