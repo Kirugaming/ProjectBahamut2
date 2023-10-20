@@ -14,7 +14,9 @@ Level::Level(const std::string& levelFile) {
                     new GameObject(
                             object["name"].as<std::string>(),
                             object["model"].as<std::string>(),
-                            glm::vec3(object["position"][0].as<float>(), object["position"][1].as<float>(), object["position"][2].as<float>())
+                            glm::vec3(object["position"][0].as<float>(), object["position"][1].as<float>(), object["position"][2].as<float>()),
+                            glm::vec3(object["rotation"][0].as<float>(), object["rotation"][1].as<float>(), object["rotation"][2].as<float>()),
+                            glm::vec3(object["scale"][0].as<float>(), object["scale"][1].as<float>(), object["scale"][2].as<float>())
                     )
             );
         }
