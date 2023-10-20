@@ -21,9 +21,7 @@ Engine::Engine() {
     // init game
     game.camera = Camera(glm::vec3(0.0f, 1.0f, 2.0f));
 
-    auto* model = new GameObject("Raphtalia", Model("raph/raph.obj"));
-
-    game.models.push_back(model);
+    game.level = *new Level("test.yaml");
 }
 
 /*
@@ -52,7 +50,7 @@ int Engine::initRendering(int winHeight, int winWidth) {
     }
 
     // OpenGL rendering settings
-    glViewport(0, 0, winWidth, winHeight);
+    glViewport(0, 0, winWidth / 2, winHeight / 2);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
@@ -74,21 +72,16 @@ void Engine::engineLoop() {
 
 
 
-
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
         ImGui::ShowDemoWindow(); // Show demo window! :)
 
-        ImGui::Begin("Hello World!");
-        ImGui::Text("Hello World!");
-        ImGui::End();
-
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glClearColor(.2f, .3f, .3f, 1.0f);
 
-        for (GameObject* model : game.models) {
+        for (GameObject* model : game.level.gameObjects) {
             model->draw(game.camera.getView());
         }
 
@@ -110,7 +103,7 @@ void Engine::eventMonitor() {
             case SDL_WINDOWEVENT:
                 switch (event->window.event) {
                     case SDL_WINDOWEVENT_RESIZED:
-                        glViewport(0, 0, event->window.data1, event->window.data2);
+                        glViewport(event->window.data1 / 6, event->window.data2 / 3, event->window.data1 / 1.5, event->window.data2 / 1.5);
                         break;
                 }
                 break;
@@ -155,7 +148,7 @@ void Engine::KeyboardInput() { // possible to do this elsewhere but its here for
     }
 }
 
-int Engine::initEngineUI() {
+int Engine::initEngineUI() const {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();

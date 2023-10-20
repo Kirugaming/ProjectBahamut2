@@ -7,8 +7,16 @@
 #include <utility>
 
 
-GameObject::GameObject(std::string name, Model model) : shader(), name(std::move(name)), model(std::move(model)) {
+GameObject::GameObject(std::string name, const std::string& modelPath) : shader(), name(std::move(name)),  model(*new Model(modelPath.c_str())){
     transform = Transform();
+}
+
+GameObject::GameObject(std::string name, const std::string &modelPath, glm::vec3 position, glm::vec3 rotation,
+                       glm::vec3 scale) : shader(), name(std::move(name)),  model(*new Model(modelPath.c_str())) {
+    transform = Transform();
+    transform.position = position;
+    transform.rotation = glm::angleAxis(glm::radians(90.0f), rotation);
+    transform.scale = scale;
 }
 
 void GameObject::draw(glm::mat4 cameraView) {
