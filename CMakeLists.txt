@@ -16,7 +16,7 @@ set(IMGUI_SOURCES lib/imgui/imgui.cpp
 include_directories(lib/imgui)
 
 # Must set the path to the main.cpp, for example: scripts/main.cpp if it is inside a folder
-set(SOURCE_FILES main.cpp main.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp Model.h Transformation.cpp Transformation.h GameObject.cpp GameObject.h Camera.cpp Camera.h Engine.h Engine.cpp)
+set(SOURCE_FILES main.cpp main.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp Model.h Transformation.cpp Transformation.h GameObject.cpp GameObject.h Camera.cpp Camera.h Engine.h Engine.cpp Level.cpp Level.h)
 set(LIB_FILES glad.c)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${LIB_FILES} ${IMGUI_SOURCES})
 
@@ -26,7 +26,9 @@ set(BUILD_SHARED_LIBS ON)
 
 target_include_directories(${PROJECT_NAME} PRIVATE include/)
 
-
+# yaml-cpp
+add_subdirectory("lib/yaml-cpp")
+target_link_libraries(${PROJECT_NAME} yaml-cpp::yaml-cpp)
 
 # SDL
 add_subdirectory("lib/SDL2/")
@@ -48,6 +50,7 @@ target_link_libraries(${PROJECT_NAME} glm)
 set(lib_dlls
         ${PROJECT_BINARY_DIR}/lib/assimp/bin/assimpd.dll
         ${PROJECT_BINARY_DIR}/lib/SDL2/SDL2d.dll
+        ${PROJECT_BINARY_DIR}/lib/yaml-cpp/yaml-cppd.dll
         )
 add_custom_command(
         TARGET ${PROJECT_NAME}

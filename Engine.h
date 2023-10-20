@@ -14,13 +14,14 @@
 #include "GameObject.h"
 #include "SDL.h"
 #include "imgui.h"
+#include "Level.h"
 
 struct Game {
-    bool quit;
+    bool quit{};
     Camera camera;
+    Level level;
     float deltaTime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     std::chrono::time_point<std::chrono::steady_clock> lastFrame;
-    std::vector<GameObject*> models;
 };
 
 class Engine {
@@ -31,9 +32,9 @@ public:
     SDL_Event *event;
     const Uint8 *keys = SDL_GetKeyboardState(nullptr);
 
-    bool rightMouseButtonPressed = false;
-    int initialMouseX = 0;
-    int initialMouseY = 0;
+    bool rightMouseButtonPressed;
+    int initialMouseX;
+    int initialMouseY; // dont remove this code or seg fault
 
     Game game;
     // Dear Imgui to be implemented
@@ -47,9 +48,8 @@ public:
 
 private:
     int initRendering(int winHeight, int winWidth); // SDL and OpenGL
-    int initEngineUI();
+    int initEngineUI() const;
     void eventMonitor();
-
     void KeyboardInput();
 };
 

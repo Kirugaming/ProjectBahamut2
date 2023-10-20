@@ -7,7 +7,7 @@
 #include <utility>
 
 
-GameObject::GameObject(std::string name, Model model) : shader(), name(std::move(name)), model(std::move(model)) {
+GameObject::GameObject(std::string name, const std::string& modelPath) : shader(), name(std::move(name)),  model(*new Model(modelPath.c_str())){
     transform = Transform();
 }
 

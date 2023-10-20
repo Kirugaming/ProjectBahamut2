@@ -20,7 +20,7 @@ public:
     Shader shader;
 
     // GameObject(); TODO: make default
-    GameObject(std::string name, Model model);
+    GameObject(std::string name, const std::string& modelPath);
 
     void draw();
 
