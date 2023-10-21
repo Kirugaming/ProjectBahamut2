@@ -10,8 +10,8 @@
 Engine::Engine(){
     SDL_GetCurrentDisplayMode(0, &displayMode);
     if (initRendering(
-            (displayMode.h-50) / 1.1,
-            (displayMode.w) / 1.1) != 0) {
+            (displayMode.h-50),
+            (displayMode.w) != 0)) {
         std::cout << "ENGINE_ERROR::INIT_RENDERING" << std::endl;
     }
 
