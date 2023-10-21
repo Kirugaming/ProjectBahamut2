@@ -7,7 +7,7 @@
 #include "backends/imgui_impl_opengl3.h"
 
 
-Engine::Engine() {
+Engine::Engine(){
     SDL_GetCurrentDisplayMode(0, &displayMode);
     if (initRendering(
             (displayMode.h-50) / 1.1,
@@ -15,13 +15,15 @@ Engine::Engine() {
         std::cout << "ENGINE_ERROR::INIT_RENDERING" << std::endl;
     }
 
-    // init engine ui
-    initEngineUI();
+    game = new Game();
 
     // init game
-    game.camera = Camera(glm::vec3(0.0f, 1.0f, 2.0f));
+    game->camera = Camera(glm::vec3(0.0f, 1.0f, 2.0f));
 
-    game.level = *new Level("test.yaml");
+    game->level = new Level("test.yaml");
+
+    // init engine ui
+    ui = new engineUI(window, glContext);
 }
 
 /*
@@ -58,11 +60,11 @@ int Engine::initRendering(int winHeight, int winWidth) {
 }
 
 void Engine::engineLoop() {
-    while(!game.quit){
+    while(!game->quit){
         // delta time
         auto now = std::chrono::steady_clock::now();
-        game.deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - game.lastFrame).count() / 1000.0f;
-        game.lastFrame = now;
+        game->deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - game->lastFrame).count() / 1000.0f;
+        game->lastFrame = now;
 
 
         // Events
@@ -72,21 +74,14 @@ void Engine::engineLoop() {
 
 
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
-        ImGui::ShowDemoWindow(); // Show demo window! :)
-
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glClearColor(.2f, .3f, .3f, 1.0f);
 
-        for (GameObject* model : game.level.gameObjects) {
-            model->draw(game.camera.getView());
+        for (GameObject* model : game->level->gameObjects) {
+            model->draw(game->camera.getView());
         }
 
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        ui->renderUI(game);
 
         SDL_GL_SwapWindow(window);
     }
@@ -94,16 +89,16 @@ void Engine::engineLoop() {
 
 
 void Engine::eventMonitor() {
-    while( SDL_PollEvent( event ) ) {
-        ImGui_ImplSDL2_ProcessEvent(event); // Forward your event to backend
-        switch (event->type) {
+    while( SDL_PollEvent( &event ) ) {
+        ImGui_ImplSDL2_ProcessEvent(&event); // Forward your event to backend
+        switch (event.type) {
             case SDL_QUIT:
-                game.quit = true;
+                game->quit = true;
                 break;
             case SDL_WINDOWEVENT:
-                switch (event->window.event) {
+                switch (event.window.event) {
                     case SDL_WINDOWEVENT_RESIZED:
-                        glViewport(event->window.data1 / 6, event->window.data2 / 3, event->window.data1 / 1.5, event->window.data2 / 1.5);
+                        glViewport(event.window.data1 / 6, event.window.data2 / 3, event.window.data1 / 1.5, event.window.data2 / 1.5);
                         break;
                 }
                 break;
@@ -112,9 +107,6 @@ void Engine::eventMonitor() {
 }
 
 Engine::~Engine() {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
     // cleanup
     SDL_GL_DeleteContext(glContext);
     SDL_DestroyWindow( window );
@@ -123,40 +115,34 @@ Engine::~Engine() {
 
 void Engine::KeyboardInput() { // possible to do this elsewhere but its here for now
     if (keys[SDL_SCANCODE_W]) {
-        game.camera.movement(Camera::FORWARD, game.deltaTime);
+        game->camera.movement(Camera::FORWARD, game->deltaTime);
     }
     if (keys[SDL_SCANCODE_S]) {
-        game.camera.movement(Camera::BACKWARD, game.deltaTime);
+        game->camera.movement(Camera::BACKWARD, game->deltaTime);
     }
     if (keys[SDL_SCANCODE_A]) {
-        game.camera.movement(Camera::LEFT, game.deltaTime);
+        game->camera.movement(Camera::LEFT, game->deltaTime);
     }
     if (keys[SDL_SCANCODE_D]) {
-        game.camera.movement(Camera::RIGHT, game.deltaTime);
+        game->camera.movement(Camera::RIGHT, game->deltaTime);
     }
     if (keys[SDL_SCANCODE_UP]) {
-        game.camera.setPitch(1);
+        game->camera.setPitch(1);
     }
     if (keys[SDL_SCANCODE_DOWN]) {
-        game.camera.setPitch(-1);
+        game->camera.setPitch(-1);
     }
     if (keys[SDL_SCANCODE_LEFT]) {
-        game.camera.setYaw(-1);
+        game->camera.setYaw(-1);
     }
     if (keys[SDL_SCANCODE_RIGHT]) {
-        game.camera.setYaw(1);
+        game->camera.setYaw(1);
     }
 }
 
 int Engine::initEngineUI() const {
     // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
 
-    // Setup Platform/Renderer backends
-    ImGui_ImplSDL2_InitForOpenGL(window, glContext);
-    ImGui_ImplOpenGL3_Init();
 
     return 0;
 }
