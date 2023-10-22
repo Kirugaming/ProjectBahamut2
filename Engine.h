@@ -16,16 +16,9 @@
 #include "imgui.h"
 #include "Level.h"
 #include "engineUI.h"
+#include "Game.h"
 
 class engineUI;
-
-struct Game {
-    bool quit{};
-    Camera camera;
-    Level *level;
-    float deltaTime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    std::chrono::time_point<std::chrono::steady_clock> lastFrame;
-};
 
 class Engine {
 public:
@@ -35,7 +28,7 @@ public:
     SDL_Event event;
     const Uint8 *keys = SDL_GetKeyboardState(nullptr);
 
-    Game *game;
+    Game game;
     engineUI *ui;
     // Dear Imgui to be implemented
     Engine();
@@ -48,7 +41,6 @@ public:
 
 private:
     int initRendering(int winHeight, int winWidth); // SDL and OpenGL
-    int initEngineUI() const;
     void eventMonitor();
     void KeyboardInput();
 };

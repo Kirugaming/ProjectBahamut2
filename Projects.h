@@ -27,10 +27,11 @@ class ProjectsWindow {
     SDL_Event event;
 
     bool quit = false;
-    bool isMakeNewProjectOpen = false;
+    bool isMakeNewProjectOpen;
     Project *newProject = nullptr;
     std::vector<Project> projectList;
 
+    void renderUi();
     void openProjectFile();
     void makeNewProject();
     void appendNewProject();
@@ -39,6 +40,7 @@ class ProjectsWindow {
 public:
 
     ProjectsWindow();
+    ~ProjectsWindow();
     void renderLoop();
 
 };
