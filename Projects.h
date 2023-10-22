@@ -1,0 +1,47 @@
+//
+// Created by kirut on 10/21/2023.
+//
+
+#ifndef PROJECTBAHAMUT_PROJECTS_H
+#define PROJECTBAHAMUT_PROJECTS_H
+
+#include <string>
+
+#include "sdl.h"
+#include "imgui.h"
+#include "backends/imgui_impl_sdl2.h"
+#include "backends/imgui_impl_sdlrenderer2.h"
+#include <yaml-cpp/yaml.h>
+
+struct Project {
+    std::string name;
+    std::string path;
+    // last edited
+
+    Project(std::string inName, std::string inPath);
+};
+
+class ProjectsWindow {
+    SDL_Window *window = nullptr;
+    SDL_Renderer* renderer = nullptr;
+    SDL_Event event;
+
+    bool quit = false;
+    bool isMakeNewProjectOpen = false;
+    Project *newProject = nullptr;
+    std::vector<Project> projectList;
+
+    void openProjectFile();
+    void makeNewProject();
+    void appendNewProject();
+
+
+public:
+
+    ProjectsWindow();
+    void renderLoop();
+
+};
+
+
+#endif //PROJECTBAHAMUT_PROJECTS_H

@@ -30,11 +30,6 @@ Engine::Engine(){
  * Startup SDL rendering and OpenGL rendering
  */
 int Engine::initRendering(int winHeight, int winWidth) {
-    // Init SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        std::cout << "SDL FAILED TO INITIALIZE!\n " << SDL_GetError() << std::endl;
-        return -1;
-    }
     // Create Window
     window = SDL_CreateWindow("ProjectBahamut", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, winWidth, winHeight,
                               SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_MAXIMIZED);
