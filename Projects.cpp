@@ -52,6 +52,13 @@ void ProjectsWindow::renderLoop() {
         SDL_RenderPresent(renderer);
     }
 
+    ImGui_ImplSDLRenderer2_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 }
 
 void ProjectsWindow::makeNewProject() {
@@ -105,13 +112,7 @@ void ProjectsWindow::openProjectFile() {
 }
 
 ProjectsWindow::~ProjectsWindow() {
-    ImGui_ImplSDLRenderer2_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
 
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
 }
 
 void ProjectsWindow::renderUi() {
@@ -124,8 +125,10 @@ void ProjectsWindow::renderUi() {
     }
     ImGui::Separator();
     ImGui::Text("Existing Projects: ");
-    for (const Project& project : projectList) {
+    for (Project &project : projectList) {
         if (ImGui::Button((project.name + "\n" + project.path).c_str())) {
+            selectedProject = &project;
+            quit = true;
         }
     }
 

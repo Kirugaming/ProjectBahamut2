@@ -17,6 +17,7 @@
 #include "Level.h"
 #include "engineUI.h"
 #include "Game.h"
+#include "Projects.h"
 
 class engineUI;
 
@@ -28,10 +29,11 @@ public:
     SDL_Event event;
     const Uint8 *keys = SDL_GetKeyboardState(nullptr);
 
+    Project project;
     Game game;
     engineUI *ui;
     // Dear Imgui to be implemented
-    Engine();
+    Engine(Project &chosenProject);
     ~Engine();
 
 

@@ -7,7 +7,7 @@
 #include "backends/imgui_impl_opengl3.h"
 
 
-Engine::Engine(){
+Engine::Engine(Project &chosenProject) : project(chosenProject) {
     SDL_GetCurrentDisplayMode(0, &displayMode);
     if (initRendering(
             (displayMode.h-50),

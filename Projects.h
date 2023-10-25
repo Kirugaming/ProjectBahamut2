@@ -38,7 +38,7 @@ class ProjectsWindow {
 
 
 public:
-
+    Project *selectedProject = nullptr;
     ProjectsWindow();
     ~ProjectsWindow();
     void renderLoop();

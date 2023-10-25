@@ -18,9 +18,11 @@ int main(int argc, char *argv[]) {
 
     ProjectsWindow projects;
     projects.renderLoop();
+    Project chosenProject = *projects.selectedProject;
+    //delete &projects;
 
-//    Engine engine;
-//    engine.engineLoop();
+    Engine engine(chosenProject);
+    engine.engineLoop();
 
     return 0;
 }
