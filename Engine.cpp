@@ -20,7 +20,7 @@ Engine::Engine(Project &chosenProject) : project(chosenProject) {
     // init game
     game.camera = Camera(glm::vec3(0.0f, 1.0f, 2.0f));
 
-    game.level = new Level("test.yaml");
+    game.level = new Level(project.path, project.path + "/test.yaml");
 
     // init engine ui
     ui = new engineUI(window, glContext);

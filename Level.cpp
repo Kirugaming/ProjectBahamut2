@@ -4,7 +4,7 @@
 
 #include "Level.h"
 
-Level::Level(const std::string& levelFile) {
+Level::Level(std::string &projectPath, const std::string& levelFile) {
     try {
         YAML::Node level = YAML::LoadFile(levelFile);
         
@@ -13,7 +13,7 @@ Level::Level(const std::string& levelFile) {
             gameObjects.push_back(
                     new GameObject(
                             object["name"].as<std::string>(),
-                            object["model"].as<std::string>(),
+                            projectPath + "/" + object["model"].as<std::string>(),
                             glm::vec3(object["position"][0].as<float>(), object["position"][1].as<float>(), object["position"][2].as<float>()),
                             glm::vec3(object["rotation"][0].as<float>(), object["rotation"][1].as<float>(), object["rotation"][2].as<float>()),
                             glm::vec3(object["scale"][0].as<float>(), object["scale"][1].as<float>(), object["scale"][2].as<float>())
