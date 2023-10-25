@@ -27,6 +27,8 @@ void engineUI::renderUI(Game *game) {
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
+    projectFileExplorer();
+
     ImGuiWindowFlags guiWindowFlags = 0;
     guiWindowFlags |= ImGuiWindowFlags_NoMove;
     guiWindowFlags |= ImGuiWindowFlags_NoResize;
@@ -97,6 +99,33 @@ void engineUI::objectEditWindow(GameObject *gameObject) {
         gameObject->transform.scale = scale;
     }
     ImGui::Separator();
+
+    ImGui::End();
+}
+
+void engineUI::projectFileExplorer() {
+    ImGui::SetNextWindowSize(ImVec2(320, ImGui::GetIO().DisplaySize.y), ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
+    ImGui::Begin("Project Explorer", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+    ImGui::Text("Project Explorer");
+    ImGui::Separator();
+
+    std::string path = R"(D:\Projects\ProjectBahamut\Test)"; // TODO: PULL PROJECT PATH
+    for (const auto &file : std::filesystem::directory_iterator(path)) { // TODO: MAKE RECURSIVE
+        if (file.is_directory()) {
+            if (!ImGui::Button(file.path().filename().string().c_str())) { // TODO: STAY OPEN
+                for (const auto &file1 : std::filesystem::directory_iterator(file.path())) {
+                    ImGui::Text("\t- "); // it would be nice if UNICODE CHARACTERS WORKED
+                    ImGui::SameLine();
+                    if (ImGui::Button(file1.path().filename().string().c_str())) {
+                    }
+                }
+            }
+        } else {
+            if (ImGui::Button(file.path().filename().string().c_str())) {
+            }
+        }
+    }
 
     ImGui::End();
 }

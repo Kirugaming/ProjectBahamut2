@@ -12,6 +12,7 @@ struct Game;
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl2.h"
 #include "Engine.h"
+#include <filesystem>
 
 
 
@@ -27,6 +28,7 @@ public:
 private:
     GameObject *selectedObject = nullptr;
     void objectEditWindow(GameObject *gameObject);
+    void projectFileExplorer();
 };
 
 

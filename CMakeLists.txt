@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 project(ProjectBahamut)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # imgui
 set(IMGUI_SOURCES lib/imgui/imgui.cpp
