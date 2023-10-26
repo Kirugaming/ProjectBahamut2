@@ -10,6 +10,9 @@
 #include "glm/vec3.hpp"
 #include "glm/vec2.hpp"
 #include "Shader.h"
+#include "Texture.h"
+
+
 
 struct Vertex {
     glm::vec3 position;
@@ -17,19 +20,18 @@ struct Vertex {
     glm::vec2 texCoords;
 };
 
-struct Texture {
-    unsigned int id;
+struct MeshTexture {
+    Texture *texture;
     std::string type;
-    std::string path;
 };
 
 class Mesh {
 public:
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    std::vector<Texture> textures;
+    std::vector<MeshTexture> textures;
 
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<MeshTexture> textures);
     void draw(Shader &shader);
 private:
     unsigned int VAO{}, VBO{}, EBO{};

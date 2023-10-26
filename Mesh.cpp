@@ -6,7 +6,7 @@
 
 #include <utility>
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures) {
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<MeshTexture> textures) {
     this->vertices = std::move(vertices);
     this->indices = std::move(indices);
     this->textures = std::move(textures);
@@ -26,7 +26,7 @@ void Mesh::draw(Shader &shader) {
             number = std::to_string(scount++);
 
         shader.setInt((name + number).c_str(), i);
-        glBindTexture(GL_TEXTURE_2D, textures[i].id);
+        glBindTexture(GL_TEXTURE_2D, textures[i].texture->id);
         glActiveTexture(GL_TEXTURE0+i);
     }
 

@@ -14,6 +14,10 @@ engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext, Project &inProj
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, glContext);
     ImGui_ImplOpenGL3_Init();
+
+    // load icons
+    icons["folderClosed"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\folder-solid.png)");
+    icons["folderOpen"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\folder-open-regular.png)");
 }
 
 engineUI::~engineUI() {
@@ -125,7 +129,7 @@ void engineUI::displayFileTree(const std::string path, int level) {
         tabs += "-";
     }
 
-    for (const auto &file : std::filesystem::directory_iterator(path)) { 
+    for (const auto &file : std::filesystem::directory_iterator(path)) {
         ImGui::Text(tabs.c_str()); // it would be nice if UNICODE CHARACTERS WORKED
         ImGui::SameLine();
 

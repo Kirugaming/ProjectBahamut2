@@ -18,6 +18,7 @@ struct Game;
 class Project;
 
 
+
 class engineUI {
 public:
     engineUI(SDL_Window *window, SDL_GLContext &glContext, Project &inProject);
@@ -28,6 +29,7 @@ public:
 
 private:
     Project &project;
+    std::map<std::string, Texture*> icons;
     GameObject *selectedObject = nullptr;
     std::unordered_set<std::string> openFolders;
 

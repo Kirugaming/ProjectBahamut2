@@ -16,7 +16,9 @@ set(IMGUI_SOURCES lib/imgui/imgui.cpp
 include_directories(lib/imgui)
 
 # Must set the path to the main.cpp, for example: scripts/main.cpp if it is inside a folder
-set(SOURCE_FILES main.cpp main.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp Model.h Transformation.cpp Transformation.h GameObject.cpp GameObject.h Camera.cpp Camera.h Engine.h Engine.cpp Level.cpp Level.h engineUI.cpp engineUI.h Projects.cpp Projects.h Game.cpp Game.h)
+set(SOURCE_FILES main.cpp main.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp Model.h Transformation.cpp Transformation.h GameObject.cpp GameObject.h Camera.cpp Camera.h Engine.h Engine.cpp Level.cpp Level.h engineUI.cpp engineUI.h Projects.cpp Projects.h Game.cpp Game.h
+        Texture.cpp
+        Texture.h)
 set(LIB_FILES glad.c)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${LIB_FILES} ${IMGUI_SOURCES})
 
@@ -63,7 +65,7 @@ add_custom_command(
 # Copy Shader files to build
 add_custom_command(TARGET ${PROJECT_NAME}
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo "Copying Shaders to build directory"
+        COMMAND ${CMAKE_COMMAND} -E echo "Copying engine assets to build directory"
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PROJECT_SOURCE_DIR}/shaders ${PROJECT_BINARY_DIR}/shaders > copy_shaders.log 2>&1
+        ${PROJECT_SOURCE_DIR}/Assets ${PROJECT_BINARY_DIR}/Assets > copy_assets.log 2>&1
         COMMENT "Copying Shaders to build directory")
