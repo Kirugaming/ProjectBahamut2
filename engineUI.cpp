@@ -5,7 +5,7 @@
 #include "engineUI.h"
 
 
-engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext, Project &inProject) : project(inProject){
+engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext){
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -114,7 +114,7 @@ void engineUI::projectFileExplorer() {
     ImGui::Text("Project Explorer");
     ImGui::Separator();
 
-    displayFileTree(project.path, 0);
+    displayFileTree(engine->project.path, 0);
 
 
     ImGui::End();
@@ -123,13 +123,14 @@ void engineUI::projectFileExplorer() {
  * Recursively goes through files from project root and make button for each
  * if directory then does function again
  */
-void engineUI::displayFileTree(const std::string path, int level) {
+void engineUI::displayFileTree(const std::string &path, int level) {
     std::string tabs(level, '\t');
     if (level > 0) {
         tabs += "-";
     }
 
     for (const auto &file : std::filesystem::directory_iterator(path)) {
+        auto fileName = file.path().filename().string();
         ImGui::Text(tabs.c_str()); // it would be nice if UNICODE CHARACTERS WORKED
         ImGui::SameLine();
 
@@ -137,14 +138,10 @@ void engineUI::displayFileTree(const std::string path, int level) {
             // find if directory is open in ui
             bool isOpen = openFolders.find(file.path().string()) != openFolders.end();
 
-            if (!isOpen) {
-                ImGui::Image((void*)(intptr_t) icons["folderClosed"]->id, ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
-            } else {
-                ImGui::Image((void*)(intptr_t) icons["folderOpen"]->id, ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
-            }
+            ImGui::Image((void*)(intptr_t)(isOpen ? icons["folderOpen"]->id : icons["folderClosed"]->id), ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
             ImGui::SameLine();
 
-            if (ImGui::Button(file.path().filename().string().c_str())) {
+            if (ImGui::Button(fileName.c_str())) {
                 // path is added to open directories if not open
                 if (!isOpen) {
                     openFolders.insert(file.path().string());
@@ -158,7 +155,10 @@ void engineUI::displayFileTree(const std::string path, int level) {
             }
         } else {
 
-            if (ImGui::Button(file.path().filename().string().c_str())) { // do file action
+            if (ImGui::Button(fileName.c_str())) { // do file action
+                if (fileName.substr(fileName.length()-4, fileName.length()) == "yaml") {
+                    engine->game.level = new Level(engine->project.path, file.path().string());
+                }
             }
         }
     }

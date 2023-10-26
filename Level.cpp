@@ -4,7 +4,9 @@
 
 #include "Level.h"
 
-Level::Level(std::string &projectPath, const std::string& levelFile) {
+Level::Level() = default;
+
+Level::Level(const std::string &projectPath, const std::string& levelFile) {
     try {
         YAML::Node level = YAML::LoadFile(levelFile);
         
@@ -28,5 +30,3 @@ Level::Level(std::string &projectPath, const std::string& levelFile) {
         std::cerr << "Error: " << e.what() << std::endl;
     }
 }
-
-Level::Level() = default;

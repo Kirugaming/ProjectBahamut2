@@ -22,6 +22,11 @@ int main(int argc, char *argv[]) {
     //delete &projects;
 
     Engine engine(chosenProject);
+    engineUI ui(engine.window, engine.glContext);
+
+    engine.ui = &ui; // ui and engine need to know stuff from each other
+    ui.engine = &engine;
+
     engine.engineLoop();
 
     return 0;

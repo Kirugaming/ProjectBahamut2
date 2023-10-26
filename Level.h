@@ -14,7 +14,7 @@ public:
     std::vector<GameObject*> gameObjects;
 
     Level();
-    Level(std::string &projectPath, const std::string& levelFile);
+    Level(const std::string &projectPath, const std::string& levelFile);
 
 
 private:
