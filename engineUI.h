@@ -13,22 +13,27 @@ struct Game;
 #include "backends/imgui_impl_sdl2.h"
 #include "Engine.h"
 #include <filesystem>
+#include <unordered_set>
 
-
+class Project;
 
 
 class engineUI {
 public:
-    engineUI(SDL_Window *window, SDL_GLContext &glContext);
+    engineUI(SDL_Window *window, SDL_GLContext &glContext, Project &inProject);
 
     ~engineUI();
 
     void renderUI(Game *game);
 
 private:
+    Project &project;
     GameObject *selectedObject = nullptr;
+    std::unordered_set<std::string> openFolders;
+
     void objectEditWindow(GameObject *gameObject);
     void projectFileExplorer();
+    void displayFileTree(const std::string path, int level);
 };
 
 

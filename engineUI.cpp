@@ -5,7 +5,7 @@
 #include "engineUI.h"
 
 
-engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext) {
+engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext, Project &inProject) : project(inProject){
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -110,22 +110,45 @@ void engineUI::projectFileExplorer() {
     ImGui::Text("Project Explorer");
     ImGui::Separator();
 
-    std::string path = R"(D:\Projects\ProjectBahamut\Test)"; // TODO: PULL PROJECT PATH
-    for (const auto &file : std::filesystem::directory_iterator(path)) { // TODO: MAKE RECURSIVE
+    displayFileTree(project.path, 0);
+
+
+    ImGui::End();
+}
+/*
+ * Recursively goes through files from project root and make button for each
+ * if directory then does function again
+ */
+void engineUI::displayFileTree(const std::string path, int level) {
+    std::string tabs(level, '\t');
+    if (level > 0) {
+        tabs += "-";
+    }
+
+    for (const auto &file : std::filesystem::directory_iterator(path)) { 
+        ImGui::Text(tabs.c_str()); // it would be nice if UNICODE CHARACTERS WORKED
+        ImGui::SameLine();
+
         if (file.is_directory()) {
-            if (!ImGui::Button(file.path().filename().string().c_str())) { // TODO: STAY OPEN
-                for (const auto &file1 : std::filesystem::directory_iterator(file.path())) {
-                    ImGui::Text("\t- "); // it would be nice if UNICODE CHARACTERS WORKED
-                    ImGui::SameLine();
-                    if (ImGui::Button(file1.path().filename().string().c_str())) {
-                    }
+            // find if directory is open in ui
+            bool isOpen = openFolders.find(file.path().string()) != openFolders.end();
+
+            if (ImGui::Button(file.path().filename().string().c_str())) {
+                // path is added to open directories if not open
+                if (!isOpen) {
+                    openFolders.insert(file.path().string());
+                } else {
+                    openFolders.erase(file.path().string());
                 }
             }
+
+            if (isOpen) {
+                displayFileTree(file.path().string(), level + 1);
+            }
         } else {
-            if (ImGui::Button(file.path().filename().string().c_str())) {
+
+            if (ImGui::Button(file.path().filename().string().c_str())) { // do file action
             }
         }
     }
-
-    ImGui::End();
 }

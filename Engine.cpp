@@ -23,7 +23,7 @@ Engine::Engine(Project &chosenProject) : project(chosenProject) {
     game.level = new Level(project.path, project.path + "/test.yaml");
 
     // init engine ui
-    ui = new engineUI(window, glContext);
+    ui = new engineUI(window, glContext, project);
 }
 
 /*
