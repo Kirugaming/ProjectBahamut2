@@ -137,6 +137,13 @@ void engineUI::displayFileTree(const std::string path, int level) {
             // find if directory is open in ui
             bool isOpen = openFolders.find(file.path().string()) != openFolders.end();
 
+            if (!isOpen) {
+                ImGui::Image((void*)(intptr_t) icons["folderClosed"]->id, ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
+            } else {
+                ImGui::Image((void*)(intptr_t) icons["folderOpen"]->id, ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
+            }
+            ImGui::SameLine();
+
             if (ImGui::Button(file.path().filename().string().c_str())) {
                 // path is added to open directories if not open
                 if (!isOpen) {
