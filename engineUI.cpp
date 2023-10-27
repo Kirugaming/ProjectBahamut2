@@ -44,7 +44,13 @@ void engineUI::renderUI(Game *game) {
     ImGui::SetNextWindowSize(ImVec2(320, 300), ImGuiCond_Once);
 
     ImGui::Begin("Game Object Editor", reinterpret_cast<bool *>(true), guiWindowFlags);
+
     ImGui::Text("Game Object Editor");
+    ImGui::SameLine();
+    if (ImGui::Button("Save Map")) {
+        engine->game.level->save();
+    }
+
     ImGui::Separator();
     ImGui::Text("Game Objects:");
 
@@ -157,7 +163,8 @@ void engineUI::displayFileTree(const std::string &path, int level) {
 
             if (ImGui::Button(fileName.c_str())) { // do file action
                 if (fileName.substr(fileName.length()-4, fileName.length()) == "yaml") {
-                    engine->game.level = new Level(engine->project.path, file.path().string());
+                    selectedObject = nullptr;
+                    engine->game.level = new Level(file.path().string());
                 }
             }
         }

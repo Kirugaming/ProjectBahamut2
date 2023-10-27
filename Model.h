@@ -17,10 +17,13 @@
 class Model {
 public:
     explicit Model(const char *path) {
+        modelPath = path;
         loadModel(path);
     }
+    std::string modelPath;
     void draw(Shader &shader);
 private:
+
     std::vector<Mesh> meshes;
     std::string directory;
 
