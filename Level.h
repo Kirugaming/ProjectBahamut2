@@ -11,10 +11,13 @@
 
 class Level {
 public:
+    std::string path;
     std::vector<GameObject*> gameObjects;
 
     Level();
-    explicit Level(const std::string& levelFile);
+    Level(const std::string& levelFile);
+
+    void save() const;
 
 
 private:

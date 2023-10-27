@@ -4,7 +4,7 @@
 
 #include "Shader.h"
 
-Shader::Shader() : Shader("shaders/shader.vert", "shaders/shader.frag") {}
+Shader::Shader() : Shader("Assets/shaders/shader.vert", "Assets/shaders/shader.frag") {}
 
 Shader::Shader(const std::string &vertSource, const std::string &fragSource) {
     std::string vertCode;

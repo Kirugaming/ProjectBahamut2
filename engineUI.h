@@ -12,21 +12,31 @@ struct Game;
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl2.h"
 #include "Engine.h"
+#include <filesystem>
+#include <unordered_set>
 
+class Project;
+class Engine;
 
 
 
 class engineUI {
 public:
-    engineUI(SDL_Window *window, SDL_GLContext &glContext);
+    Engine *engine;
 
+    engineUI(SDL_Window *window, SDL_GLContext &glContext);
     ~engineUI();
 
     void renderUI(Game *game);
 
 private:
+    std::map<std::string, Texture*> icons;
     GameObject *selectedObject = nullptr;
+    std::unordered_set<std::string> openFolders;
+
     void objectEditWindow(GameObject *gameObject);
+    void projectFileExplorer();
+    void displayFileTree(const std::string &path, int level);
 };
 
 

@@ -5,7 +5,7 @@
 #include "engineUI.h"
 
 
-engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext) {
+engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext){
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -14,6 +14,10 @@ engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext) {
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, glContext);
     ImGui_ImplOpenGL3_Init();
+
+    // load icons
+    icons["folderClosed"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\folder-solid.png)");
+    icons["folderOpen"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\folder-open-regular.png)");
 }
 
 engineUI::~engineUI() {
@@ -27,6 +31,8 @@ void engineUI::renderUI(Game *game) {
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
+    projectFileExplorer();
+
     ImGuiWindowFlags guiWindowFlags = 0;
     guiWindowFlags |= ImGuiWindowFlags_NoMove;
     guiWindowFlags |= ImGuiWindowFlags_NoResize;
@@ -38,7 +44,13 @@ void engineUI::renderUI(Game *game) {
     ImGui::SetNextWindowSize(ImVec2(320, 300), ImGuiCond_Once);
 
     ImGui::Begin("Game Object Editor", reinterpret_cast<bool *>(true), guiWindowFlags);
+
     ImGui::Text("Game Object Editor");
+    ImGui::SameLine();
+    if (ImGui::Button("Save Map")) {
+        engine->game.level->save();
+    }
+
     ImGui::Separator();
     ImGui::Text("Game Objects:");
 
@@ -99,4 +111,62 @@ void engineUI::objectEditWindow(GameObject *gameObject) {
     ImGui::Separator();
 
     ImGui::End();
+}
+
+void engineUI::projectFileExplorer() {
+    ImGui::SetNextWindowSize(ImVec2(320, ImGui::GetIO().DisplaySize.y), ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
+    ImGui::Begin("Project Explorer", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+    ImGui::Text("Project Explorer");
+    ImGui::Separator();
+
+    displayFileTree(engine->project.path, 0);
+
+
+    ImGui::End();
+}
+/*
+ * Recursively goes through files from project root and make button for each
+ * if directory then does function again
+ */
+void engineUI::displayFileTree(const std::string &path, int level) {
+    std::string tabs(level, '\t');
+    if (level > 0) {
+        tabs += "-";
+    }
+
+    for (const auto &file : std::filesystem::directory_iterator(path)) {
+        auto fileName = file.path().filename().string();
+        ImGui::Text(tabs.c_str()); // it would be nice if UNICODE CHARACTERS WORKED
+        ImGui::SameLine();
+
+        if (file.is_directory()) {
+            // find if directory is open in ui
+            bool isOpen = openFolders.find(file.path().string()) != openFolders.end();
+
+            ImGui::Image((void*)(intptr_t)(isOpen ? icons["folderOpen"]->id : icons["folderClosed"]->id), ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::SameLine();
+
+            if (ImGui::Button(fileName.c_str())) {
+                // path is added to open directories if not open
+                if (!isOpen) {
+                    openFolders.insert(file.path().string());
+                } else {
+                    openFolders.erase(file.path().string());
+                }
+            }
+
+            if (isOpen) {
+                displayFileTree(file.path().string(), level + 1);
+            }
+        } else {
+
+            if (ImGui::Button(fileName.c_str())) { // do file action
+                if (fileName.substr(fileName.length()-4, fileName.length()) == "yaml") {
+                    selectedObject = nullptr;
+                    engine->game.level = new Level(file.path().string());
+                }
+            }
+        }
+    }
 }

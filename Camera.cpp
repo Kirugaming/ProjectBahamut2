@@ -18,8 +18,7 @@ glm::mat4 Camera::getView() const {
 }
 
 void Camera::movement(Camera::Input moveDirection, float deltaTime) {
-    std::cout << deltaTime << std::endl;
-    float velocity = 2.5f * deltaTime;
+    float velocity = .1f * deltaTime;
     switch (moveDirection) {
         case FORWARD:
             position += direction * velocity;
