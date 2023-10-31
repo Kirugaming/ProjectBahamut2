@@ -44,6 +44,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     std::vector<MeshTexture> textures;
+    Color colors{};
 
     for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
         Vertex vertex;
@@ -75,18 +76,40 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     }
 
     if (mesh->mMaterialIndex >= 0) {
+        // model textures
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+
         std::vector<MeshTexture> diffuseMaps = loadMaterialTextures(material,aiTextureType_DIFFUSE, "texture_diffuse");
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-        std::vector<MeshTexture> specularMaps = loadMaterialTextures(material,aiTextureType_SPECULAR, "texture_specular");
-        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+//        std::vector<MeshTexture> specularMaps = loadMaterialTextures(material,aiTextureType_SPECULAR, "texture_specular");
+//        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+
+        // model colors
+        aiColor3D color;
+        material->Get(AI_MATKEY_COLOR_AMBIENT, color);
+        colors.ambient = glm::vec3(color.r,color.g,color.b);
+        material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+        colors.diffuse = glm::vec3(color.r,color.g,color.b);
+        material->Get(AI_MATKEY_COLOR_EMISSIVE, color);
+        colors.emissive = glm::vec3(color.r,color.g,color.b);
+        material->Get(AI_MATKEY_COLOR_SPECULAR, color);
+        colors.specular = glm::vec3(color.r,color.g,color.b);
     }
 
-    return {vertices, indices, textures};
+    return {vertices, indices, textures, colors};
 }
 
 std::vector<MeshTexture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName) {
     std::vector<MeshTexture> textures;
+    if (mat->GetTextureCount(type) == 0) { // using this will cause specular to make texture default.png // specular problem
+        MeshTexture meshTexture;
+        meshTexture.texture = new Texture("default.png");
+        meshTexture.type = typeName;
+
+        textures.push_back(meshTexture);
+        return textures;
+    }
+
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
         aiString str;
         mat->GetTexture(type, i, &str);

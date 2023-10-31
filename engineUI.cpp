@@ -18,6 +18,7 @@ engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext){
     // load icons
     icons["folderClosed"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\folder-solid.png)");
     icons["folderOpen"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\folder-open-regular.png)");
+    icons["object"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\cube-solid.png)");
 }
 
 engineUI::~engineUI() {
@@ -55,6 +56,8 @@ void engineUI::renderUI(Game *game) {
     ImGui::Text("Game Objects:");
 
     for (auto object : game->level->gameObjects) {
+        ImGui::Image((void*)(intptr_t)icons["object"]->id, ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::SameLine();
         if (object->name.empty()) {
             if (ImGui::Button("##")) {
                 this->selectedObject = object;
@@ -70,6 +73,7 @@ void engineUI::renderUI(Game *game) {
 
     ImGui::End();
 
+    //ImGui::ShowDemoWindow();
 
 
     ImGui::Render();

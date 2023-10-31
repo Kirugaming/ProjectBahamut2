@@ -6,10 +6,11 @@
 
 #include <utility>
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<MeshTexture> textures) {
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<MeshTexture> textures, Color colors) {
     this->vertices = std::move(vertices);
     this->indices = std::move(indices);
     this->textures = std::move(textures);
+    this->colors = colors;
 
     setupMesh();
 }
@@ -30,10 +31,17 @@ void Mesh::draw(Shader &shader) {
         glActiveTexture(GL_TEXTURE0+i);
     }
 
+    // colors
+    // Currently Models must have textures to use colors
+    glm::vec3 finalColor = colors.diffuse; // we only need diffuse for now
+    shader.editShaderWithVec3("colors", finalColor);
+
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Mesh::setupMesh() {

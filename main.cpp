@@ -18,7 +18,11 @@ int main(int argc, char *argv[]) {
 
     ProjectsWindow projects;
     projects.renderLoop();
+    if (projects.selectedProject == nullptr) {
+        return 0; // closed without selecting anything
+    }
     Project chosenProject = *projects.selectedProject;
+
     //delete &projects;
 
     Engine engine(chosenProject);

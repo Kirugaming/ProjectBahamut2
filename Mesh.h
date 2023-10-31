@@ -20,6 +20,13 @@ struct Vertex {
     glm::vec2 texCoords;
 };
 
+struct Color {
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 emissive;
+    glm::vec3 specular;
+};
+
 struct MeshTexture {
     Texture *texture;
     std::string type;
@@ -30,8 +37,9 @@ public:
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     std::vector<MeshTexture> textures;
+    Color colors;
 
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<MeshTexture> textures);
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<MeshTexture> textures, Color colors);
     void draw(Shader &shader);
 private:
     unsigned int VAO{}, VBO{}, EBO{};

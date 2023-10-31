@@ -104,3 +104,7 @@ void Shader::getShaderCompileInfoLog(unsigned int shaderID) {
     }
 }
 
+void Shader::editShaderWithVec4(const char *uniformName, glm::vec4 &colors) const {
+    glUniform4fv(glGetUniformLocation(this->programId,uniformName),1,glm::value_ptr(colors));
+}
+
