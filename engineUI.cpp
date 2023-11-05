@@ -3,6 +3,7 @@
 //
 
 #include "engineUI.h"
+#include "Script.h"
 
 
 engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext){
@@ -19,6 +20,7 @@ engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext){
     icons["folderClosed"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\folder-solid.png)");
     icons["folderOpen"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\folder-open-regular.png)");
     icons["object"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\cube-solid.png)");
+
 }
 
 engineUI::~engineUI() {

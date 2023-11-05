@@ -18,7 +18,9 @@ include_directories(lib/imgui)
 # Must set the path to the main.cpp, for example: scripts/main.cpp if it is inside a folder
 set(SOURCE_FILES main.cpp main.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp Model.h Transformation.cpp Transformation.h GameObject.cpp GameObject.h Camera.cpp Camera.h Engine.h Engine.cpp Level.cpp Level.h engineUI.cpp engineUI.h Projects.cpp Projects.h Game.cpp Game.h
         Texture.cpp
-        Texture.h)
+        Texture.h
+        Script.cpp
+        Script.h)
 set(LIB_FILES glad.c)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${LIB_FILES} ${IMGUI_SOURCES})
 
@@ -47,12 +49,21 @@ target_link_libraries(${PROJECT_NAME} assimp::assimp)
 add_subdirectory("lib/glm/")
 target_link_libraries(${PROJECT_NAME} glm)
 
+# lua
+add_subdirectory("lib/lua")
+target_link_libraries(${PROJECT_NAME} lua)
+
+# sol2
+add_subdirectory("lib/sol2")
+target_link_libraries(${PROJECT_NAME} sol2)
+
 
 # Copy Needed DLLs to build
 set(lib_dlls
         ${PROJECT_BINARY_DIR}/lib/assimp/bin/libassimp-5d.dll
         ${PROJECT_BINARY_DIR}/lib/SDL2/SDL2d.dll
         ${PROJECT_BINARY_DIR}/lib/yaml-cpp/libyaml-cppd.dll
+        ${PROJECT_BINARY_DIR}/lib/lua/libluad.dll
         )
 add_custom_command(
         TARGET ${PROJECT_NAME}
