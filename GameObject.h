@@ -10,6 +10,9 @@
 #include "Model.h"
 #include "Transformation.h"
 #include "Camera.h"
+#include "Script.h"
+
+class Script;
 
 class GameObject {
 public:
@@ -18,6 +21,7 @@ public:
     Transform transform;
 
     Shader shader;
+    Script *script = nullptr;
 
     // GameObject(); TODO: make default
     GameObject(std::string name, const std::string& modelPath);

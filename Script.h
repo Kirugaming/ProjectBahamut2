@@ -7,12 +7,16 @@
 
 #include <string>
 #include <sol/sol.hpp>
+#include "GameObject.h"
+
+class GameObject;
 
 class Script {
 public:
+    std::string path;
     sol::state lua;
 
-    explicit Script(const std::string& scriptPath);
+    Script(const std::string& scriptPath, GameObject *attachedObject);
 };
 
 #endif //PROJECTBAHAMUT_SCRIPT_H
