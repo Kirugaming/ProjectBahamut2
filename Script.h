@@ -14,9 +14,12 @@ class GameObject;
 class Script {
 public:
     std::string path;
+    std::string scriptCode;
     sol::state lua;
 
     Script(const std::string& scriptPath, GameObject *attachedObject);
+
+    void run();
 };
 
 #endif //PROJECTBAHAMUT_SCRIPT_H

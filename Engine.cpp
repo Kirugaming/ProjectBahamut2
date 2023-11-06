@@ -67,6 +67,7 @@ void Engine::engineLoop() {
         glClearColor(.2f, .3f, .3f, 1.0f);
 
         for (GameObject* model : game.level->gameObjects) {
+            model->script->run();
             model->draw(game.camera.getView());
         }
 

@@ -25,8 +25,20 @@ Script::Script(const std::string& scriptPath, GameObject *attachedObject) : path
     lua["gameObject"] = attachedObject;
 
     try {
-        lua.script_file(scriptPath);
+        std::stringstream scriptStream;
+        std::ifstream scriptFile;
+
+        scriptFile.open(scriptPath);
+        scriptStream << scriptFile.rdbuf();
+
+        scriptFile.close();
+
+        scriptCode = scriptStream.str();
     } catch (std::exception &exception) {
         std::cout << "SCRIPT FILE FAILED TO LOAD! \n" << exception.what() << std::endl;
     }
+}
+
+void Script::run() {
+    lua.script(scriptCode);
 }
