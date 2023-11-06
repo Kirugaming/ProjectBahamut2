@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include "Script.h"
+#include "InputManager.h"
 
 Script::Script(const std::string& scriptPath, GameObject *attachedObject) : path(scriptPath) {
     lua.open_libraries(sol::lib::base);
@@ -12,7 +13,7 @@ Script::Script(const std::string& scriptPath, GameObject *attachedObject) : path
     lua.new_usertype<GameObject>("GameObject",
                                  "name", &GameObject::name,
                                  "transform", &GameObject::transform);
-    lua.new_usertype<Transform>("Transform", // need by game object
+    lua.new_usertype<Transform>("transform", // need by game object
                                 "position", &Transform::position,
                                 "rotation", &Transform::rotation,
                                 "scale", &Transform::scale);
@@ -21,7 +22,10 @@ Script::Script(const std::string& scriptPath, GameObject *attachedObject) : path
                                 "y", &glm::vec3::y,
                                 "z", &glm::vec3::z);
 
+    lua.new_usertype<InputManager>("InputManager",
+                                   "getKeyDown", &InputManager::getKeyDown);
 
+    lua["InputManager"] = InputManager::getInstance();
     lua["gameObject"] = attachedObject;
 
     try {

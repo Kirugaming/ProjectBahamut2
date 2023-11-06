@@ -18,6 +18,7 @@
 #include "engineUI.h"
 #include "Game.h"
 #include "Projects.h"
+#include "InputManager.h"
 
 class engineUI;
 
@@ -27,10 +28,10 @@ public:
     SDL_Window *window = nullptr;
     SDL_GLContext glContext = nullptr;
     SDL_Event event;
-    const Uint8 *keys = SDL_GetKeyboardState(nullptr);
 
     Project project;
     Game game;
+    InputManager &inputManager = InputManager::getInstance();
     engineUI *ui;
     // Dear Imgui to be implemented
     Engine(Project &chosenProject);
