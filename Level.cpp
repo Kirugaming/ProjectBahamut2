@@ -46,7 +46,7 @@ void Level::save() const {
         map["GameObjects"][i]["position"][1] = gameObjects[i]->transform.position.y;
         map["GameObjects"][i]["position"][2] = gameObjects[i]->transform.position.z;
         // rotation
-        glm::vec3 vecRotation = glm::eulerAngles(gameObjects[i]->transform.rotation);
+        glm::vec3 vecRotation = gameObjects[i]->transform.rotation;
         map["GameObjects"][i]["rotation"][0] = vecRotation.x;
         map["GameObjects"][i]["rotation"][1] = vecRotation.y;
         map["GameObjects"][i]["rotation"][2] = vecRotation.z;

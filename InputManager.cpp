@@ -13,6 +13,9 @@ InputManager::InputManager() {
     keyMap["down"] = SDL_SCANCODE_DOWN;
     keyMap["left"] = SDL_SCANCODE_LEFT;
     keyMap["right"] = SDL_SCANCODE_RIGHT;
+    keyMap["space"] = SDL_SCANCODE_SPACE;
+    keyMap["right shift"] = SDL_SCANCODE_RSHIFT;
+    keyMap["right ctrl"] = SDL_SCANCODE_RCTRL;
 }
 
 bool InputManager::getKeyDown(const std::string& key) {

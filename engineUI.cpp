@@ -104,9 +104,9 @@ void engineUI::objectEditWindow(GameObject *gameObject) {
     }
     ImGui::Separator();
     ImGui::Text("Object Rotation:");
-    glm::vec3 rotation = glm::eulerAngles(gameObject->transform.rotation);
+    glm::vec3 rotation = gameObject->transform.rotation;
     if (ImGui::DragFloat3("##Rotation xyz", glm::value_ptr(rotation), 0.005f)) {
-        gameObject->transform.rotation = glm::quat(rotation);
+        gameObject->transform.rotation = rotation;
     }
     ImGui::Separator();
     ImGui::Text("Object Scale:");
