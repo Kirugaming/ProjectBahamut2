@@ -33,10 +33,13 @@ private:
     std::map<std::string, Texture*> icons;
     GameObject *selectedObject = nullptr;
     std::unordered_set<std::string> openFolders;
+    std::string *fileDragTemp;
 
     void objectEditWindow(GameObject *gameObject);
     void projectFileExplorer();
     void displayFileTree(const std::string &path, int level);
+
+    void openFile(std::string path);
 };
 
 

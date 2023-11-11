@@ -20,8 +20,11 @@ Level::Level(const std::string& levelFile) {
                     glm::vec3(object["rotation"][0].as<float>(), object["rotation"][1].as<float>(), object["rotation"][2].as<float>()),
                     glm::vec3(object["scale"][0].as<float>(), object["scale"][1].as<float>(), object["scale"][2].as<float>())
             );
-            // script needs info from attached game object
-            newGameObject->script = new Script(object["script"].as<std::string>(), newGameObject);
+
+            for (int i = 0; i < object["scripts"].size(); ++i) {
+                newGameObject->scripts.push_back(new Script(object["scripts"][i].as<std::string>(), newGameObject));
+            }
+
             gameObjects.push_back(newGameObject);
         }
         for (int i = 0; i < level["GameObjects"].size(); ++i) {
@@ -55,7 +58,9 @@ void Level::save() const {
         map["GameObjects"][i]["scale"][1] = gameObjects[i]->transform.scale.y;
         map["GameObjects"][i]["scale"][2] = gameObjects[i]->transform.scale.z;
         // any scripts
-        map["GameObjects"][i]["script"] = gameObjects[i]->script->path;
+        for (int j = 0; j < gameObjects[i]->scripts.size(); ++j) {
+            map["GameObjects"][i]["scripts"][j] = gameObjects[i]->scripts[j]->path.string();
+        }
     }
 
     file << map;

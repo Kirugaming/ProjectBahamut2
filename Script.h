@@ -7,17 +7,18 @@
 
 #include <string>
 #include <sol/sol.hpp>
+#include <filesystem>
 #include "GameObject.h"
 
 class GameObject;
 
 class Script {
 public:
-    std::string path;
+    std::filesystem::path path;
     std::string scriptCode;
     sol::state lua;
 
-    Script(const std::string& scriptPath, GameObject *attachedObject);
+    Script(const std::string&, GameObject *attachedObject);
 
     void run();
 };

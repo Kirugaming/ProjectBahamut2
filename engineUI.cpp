@@ -75,7 +75,7 @@ void engineUI::renderUI(Game *game) {
 
     ImGui::End();
 
-    //ImGui::ShowDemoWindow();
+    ImGui::ShowDemoWindow();
 
 
     ImGui::Render();
@@ -115,6 +115,30 @@ void engineUI::objectEditWindow(GameObject *gameObject) {
         gameObject->transform.scale = scale;
     }
     ImGui::Separator();
+    ImGui::Text("Object Scripts");
+
+    ImGui::Text("- Attached Scripts:");
+    for (int i = 0; i < gameObject->scripts.size(); ++i) {
+        ImGui::Text(gameObject->scripts[i]->path.filename().string().c_str());
+        ImGui::SameLine();
+        if (ImGui::Button("Delete")) {
+            gameObject->scripts.erase(gameObject->scripts.begin() + i);
+        }
+    }
+
+
+
+    ImGui::Button("Drop New Script Here", ImVec2(320, 50));
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DRAG_SCRIPT_FILE")) {
+            ImGui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
+            ImGui::BeginTooltip();
+            ImGui::Text("Drop Script here to add to game object");
+            ImGui::EndTooltip();
+            gameObject->scripts.push_back(new Script(static_cast<char*>(payload->Data), gameObject)); // turn the void pointer to string :)
+        }
+        ImGui::EndDragDropTarget();
+    }
 
     ImGui::End();
 }
@@ -141,7 +165,7 @@ void engineUI::displayFileTree(const std::string &path, int level) {
         tabs += "-";
     }
 
-    for (const auto &file : std::filesystem::directory_iterator(path)) {
+    for (const auto &file: std::filesystem::directory_iterator(path)) {
         auto fileName = file.path().filename().string();
         ImGui::Text(tabs.c_str()); // it would be nice if UNICODE CHARACTERS WORKED
         ImGui::SameLine();
@@ -150,7 +174,8 @@ void engineUI::displayFileTree(const std::string &path, int level) {
             // find if directory is open in ui
             bool isOpen = openFolders.find(file.path().string()) != openFolders.end();
 
-            ImGui::Image((void*)(intptr_t)(isOpen ? icons["folderOpen"]->id : icons["folderClosed"]->id), ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::Image((void *) (intptr_t) (isOpen ? icons["folderOpen"]->id : icons["folderClosed"]->id),
+                         ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
             ImGui::SameLine();
 
             if (ImGui::Button(fileName.c_str())) {
@@ -166,11 +191,23 @@ void engineUI::displayFileTree(const std::string &path, int level) {
                 displayFileTree(file.path().string(), level + 1);
             }
         } else {
+            std::string fileType = fileName.substr(fileName.find('.') + 1, fileName.length());
 
-            if (ImGui::Button(fileName.c_str())) { // do file action
-                if (fileName.substr(fileName.length()-4, fileName.length()) == "yaml") {
-                    selectedObject = nullptr;
-                    engine->game.level = new Level(file.path().string());
+            if (fileType == "lua") { // some files have drag drop and some don't
+                if (ImGui::Button(fileName.c_str())) { // do file action
+                }
+                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
+                    ImGui::SetDragDropPayload("DRAG_SCRIPT_FILE", file.path().string().c_str(),
+                                              file.path().string().length());
+                    ImGui::Text(fileName.c_str());
+                    ImGui::EndDragDropSource();
+                }
+            } else { // normal button
+                if (ImGui::Button(fileName.c_str())) { // do file action
+                    if (fileType == "bem") {
+                        selectedObject = nullptr;
+                        engine->game.level = new Level(file.path().string());
+                    }
                 }
             }
         }

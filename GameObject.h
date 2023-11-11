@@ -21,7 +21,7 @@ public:
     Transform transform;
 
     Shader shader;
-    Script *script = nullptr;
+    std::vector<Script*> scripts;
 
     // GameObject(); TODO: make default
     GameObject(std::string name, const std::string& modelPath);

@@ -7,6 +7,7 @@
 #include "InputManager.h"
 
 Script::Script(const std::string& scriptPath, GameObject *attachedObject) : path(scriptPath) {
+
     lua.open_libraries(sol::lib::base);
 
     // you need to make these available in lua
@@ -32,7 +33,7 @@ Script::Script(const std::string& scriptPath, GameObject *attachedObject) : path
         std::stringstream scriptStream;
         std::ifstream scriptFile;
 
-        scriptFile.open(scriptPath);
+        scriptFile.open(path.string());
         scriptStream << scriptFile.rdbuf();
 
         scriptFile.close();
