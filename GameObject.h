@@ -23,6 +23,9 @@ public:
     Shader shader;
     std::vector<Script*> scripts;
 
+    // gameobject is a node in a tree
+    std::vector<GameObject*> nestedGameObjects;
+
     // GameObject(); TODO: make default
     GameObject(std::string name, const std::string& modelPath);
     GameObject(std::string name, const std::string& modelPath, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);

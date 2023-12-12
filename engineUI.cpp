@@ -16,11 +16,7 @@ engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext){
     ImGui_ImplSDL2_InitForOpenGL(window, glContext);
     ImGui_ImplOpenGL3_Init();
 
-    // load icons
-    icons["folderClosed"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\folder-solid.png)");
-    icons["folderOpen"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\folder-open-regular.png)");
-    icons["object"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\cube-solid.png)");
-
+    loadUiIcons();
 }
 
 engineUI::~engineUI() {
@@ -36,17 +32,10 @@ void engineUI::renderUI(Game *game) {
 
     projectFileExplorer();
 
-    ImGuiWindowFlags guiWindowFlags = 0;
-    guiWindowFlags |= ImGuiWindowFlags_NoMove;
-    guiWindowFlags |= ImGuiWindowFlags_NoResize;
-    guiWindowFlags |= ImGuiWindowFlags_NoCollapse;
-    guiWindowFlags |= ImGuiWindowFlags_NoNav;
-    guiWindowFlags |= ImGuiWindowFlags_NoTitleBar;
+    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x -320, 0),
+                               ImVec2(320, 300));
 
-    ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 0), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(320, 300), ImGuiCond_Once);
-
-    ImGui::Begin("Game Object Editor", reinterpret_cast<bool *>(true), guiWindowFlags);
+    ImGui::Begin("Game Object Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoTitleBar);
 
     ImGui::Text("Game Object Editor");
     ImGui::SameLine();
@@ -64,8 +53,10 @@ void engineUI::renderUI(Game *game) {
             if (ImGui::Button("##")) {
                 this->selectedObject = object;
             }
-        } else if (ImGui::Button(object->name.c_str())) {
+        } else if (ImGui::TreeNode(object->name.c_str())) {
             this->selectedObject = object;
+
+            ImGui::TreePop();
         }
     }
 
@@ -83,41 +74,19 @@ void engineUI::renderUI(Game *game) {
 }
 
 void engineUI::objectEditWindow(GameObject *gameObject) {
-    ImGui::SetNextWindowSize(ImVec2(320, 300), ImGuiCond_Once);
-    ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 300), ImGuiCond_Once);
+    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 300),
+                               ImVec2(320, 300));
     ImGui::Begin("Object Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
     ImGui::Text("This is the object editor window!");
-    ImGui::Separator();
-    ImGui::Text("Object Name:");  // Where users can edit the name of game objects
-    char buffer[256];
-    strcpy(buffer, gameObject->name.c_str());
-    if (ImGui::InputText("##Object Name", buffer, 256)) {
-        gameObject->name = buffer;
-    };
+
+    gameObject->name = drawTextInput("Object Name", gameObject->name);
+
+    gameObject->transform.position = drawVec3Input("Object Position", gameObject->transform.position);
+    gameObject->transform.rotation = drawVec3Input("Object Rotation", gameObject->transform.rotation);
+    gameObject->transform.scale = drawVec3Input("Object Scale", gameObject->transform.scale);
 
     ImGui::Separator();
-    // where users can change various transformation stuff
-    ImGui::Text("Object Position:");
-    glm::vec3 position = gameObject->transform.position;
-    if (ImGui::DragFloat3("##Position xyz", glm::value_ptr(position), 0.005f)) {
-        gameObject->transform.position = position;
-    }
-    ImGui::Separator();
-    ImGui::Text("Object Rotation:");
-    glm::vec3 rotation = gameObject->transform.rotation;
-    if (ImGui::DragFloat3("##Rotation xyz", glm::value_ptr(rotation), 0.005f)) {
-        gameObject->transform.rotation = rotation;
-    }
-    ImGui::Separator();
-    ImGui::Text("Object Scale:");
-    glm::vec3 scale = gameObject->transform.scale;
-    if (ImGui::DragFloat3("##Scale xyz", glm::value_ptr(scale), 0.005f)) {
-        gameObject->transform.scale = scale;
-    }
-    ImGui::Separator();
-    ImGui::Text("Object Scripts");
-
-    ImGui::Text("- Attached Scripts:");
+    ImGui::Text("Attached Scripts:");
     for (int i = 0; i < gameObject->scripts.size(); ++i) {
         ImGui::Text(gameObject->scripts[i]->path.filename().string().c_str());
         ImGui::SameLine();
@@ -144,8 +113,8 @@ void engineUI::objectEditWindow(GameObject *gameObject) {
 }
 
 void engineUI::projectFileExplorer() {
-    ImGui::SetNextWindowSize(ImVec2(320, ImGui::GetIO().DisplaySize.y), ImGuiCond_Once);
-    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
+    configureNextWindowPosSize(ImVec2(0, 0),
+                               ImVec2(320, ImGui::GetIO().DisplaySize.y));
     ImGui::Begin("Project Explorer", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
     ImGui::Text("Project Explorer");
     ImGui::Separator();
@@ -191,25 +160,64 @@ void engineUI::displayFileTree(const std::string &path, int level) {
                 displayFileTree(file.path().string(), level + 1);
             }
         } else {
-            std::string fileType = fileName.substr(fileName.find('.') + 1, fileName.length());
+            handleFileTypes(file);
+        }
+    }
+}
 
-            if (fileType == "lua") { // some files have drag drop and some don't
-                if (ImGui::Button(fileName.c_str())) { // do file action
-                }
-                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
-                    ImGui::SetDragDropPayload("DRAG_SCRIPT_FILE", file.path().string().c_str(),
-                                              file.path().string().length());
-                    ImGui::Text(fileName.c_str());
-                    ImGui::EndDragDropSource();
-                }
-            } else { // normal button
-                if (ImGui::Button(fileName.c_str())) { // do file action
-                    if (fileType == "bem") {
-                        selectedObject = nullptr;
-                        engine->game.level = new Level(file.path().string());
-                    }
-                }
+void engineUI::handleFileTypes(const std::filesystem::directory_entry& file) {
+    auto fileName = file.path().filename().string();
+    std::string fileType = fileName.substr(fileName.find('.') + 1, fileName.length());
+
+    if (fileType == "lua") { // some files have drag drop and some don't
+        if (ImGui::Button(fileName.c_str())) { // do file action
+        }
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
+            ImGui::SetDragDropPayload("DRAG_SCRIPT_FILE", file.path().string().c_str(),
+                                      file.path().string().capacity()); // i don't know why capacity works and not size
+            ImGui::Text(fileName.c_str());
+            ImGui::EndDragDropSource();
+        }
+    } else { // normal button
+        if (ImGui::Button(fileName.c_str())) { // do file action
+            if (fileType == "bem") {
+                selectedObject = nullptr;
+                engine->game.level = new Level(file.path().string());
             }
         }
     }
+}
+
+void engineUI::loadUiIcons() {
+    icons["folderClosed"] = new Texture(R"(Assets\icons\folder-solid.png)");
+    icons["folderOpen"] = new Texture(R"(Assets\icons\folder-open-regular.png)");
+    icons["object"] = new Texture(R"(Assets\icons\cube-solid.png)");
+}
+
+void engineUI::configureNextWindowPosSize(ImVec2 position, ImVec2 size) {
+    ImGui::SetNextWindowPos(position, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(size, ImGuiCond_Once);
+}
+
+glm::vec3 engineUI::drawVec3Input(const std::string &inputName, glm::vec3 &vector3) {
+    ImGui::Separator();
+    ImGui::Text((inputName + ":").c_str());
+    glm::vec3 vec3Buffer = vector3;
+    if (ImGui::DragFloat3(("##" + inputName).c_str(), glm::value_ptr(vec3Buffer), 0.005f)) {
+        return vec3Buffer;
+    }
+}
+
+std::string engineUI::drawTextInput(const std::string &inputName, std::string &text) {
+    ImGui::Separator();
+    ImGui::Text((inputName + ":").c_str());
+
+    char buffer[256];
+    strcpy(buffer, text.c_str());
+
+    if (ImGui::InputText(("##" + inputName).c_str(), buffer, 256)) {
+        text = buffer;
+    }
+
+    return text;
 }
