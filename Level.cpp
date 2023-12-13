@@ -13,24 +13,9 @@ Level::Level(const std::string& levelFile) {
         
         // go through game objects
         for (auto &&object : level["GameObjects"]) {
-            auto *newGameObject = new GameObject(
-                    object["name"].as<std::string>(),
-                    object["model"].as<std::string>(),
-                    glm::vec3(object["position"][0].as<float>(), object["position"][1].as<float>(), object["position"][2].as<float>()),
-                    glm::vec3(object["rotation"][0].as<float>(), object["rotation"][1].as<float>(), object["rotation"][2].as<float>()),
-                    glm::vec3(object["scale"][0].as<float>(), object["scale"][1].as<float>(), object["scale"][2].as<float>())
-            );
-
-            for (int i = 0; i < object["scripts"].size(); ++i) {
-                newGameObject->scripts.push_back(new Script(object["scripts"][i].as<std::string>(), newGameObject));
-            }
-
-            gameObjects.push_back(newGameObject);
+            gameObjects.push_back(addGameObject(object));
         }
-        for (int i = 0; i < level["GameObjects"].size(); ++i) {
-            YAML::Node object = level["GameObjects"][i];
 
-        }
     } catch (const std::exception& e) {
         std::cerr << "Map Loading Error: " << e.what() << std::endl;
     }
@@ -66,4 +51,25 @@ void Level::save() const {
     file << map;
     file.close();
 
+}
+
+GameObject* Level::addGameObject(const YAML::Node &object) {
+    auto *newGameObject = new GameObject(
+            object["name"].as<std::string>(),
+            object["model"].as<std::string>(),
+            glm::vec3(object["position"][0].as<float>(), object["position"][1].as<float>(), object["position"][2].as<float>()),
+            glm::vec3(object["rotation"][0].as<float>(), object["rotation"][1].as<float>(), object["rotation"][2].as<float>()),
+            glm::vec3(object["scale"][0].as<float>(), object["scale"][1].as<float>(), object["scale"][2].as<float>())
+    );
+
+    for (int i = 0; i < object["scripts"].size(); ++i) {
+        newGameObject->scripts.push_back(new Script(object["scripts"][i].as<std::string>(), newGameObject));
+    }
+
+    for (int i = 0; i < object["nestedObjects"].size(); ++i) {
+        newGameObject->nestedGameObjects.push_back(
+                addGameObject(object["nestedObjects"][i]));
+    }
+
+    return newGameObject;
 }

@@ -40,6 +40,7 @@ private:
     static void configureNextWindowPosSize(ImVec2 position, ImVec2 size);
     static glm::vec3 drawVec3Input(const std::string& inputName, glm::vec3 &vector3);
     static std::string drawTextInput(const std::string& inputName, std::string &text);
+    void drawGameObjectButton(std::vector<GameObject*> &gameObjects);
     void projectFileExplorer();
     void displayFileTree(const std::string &path, int level);
     void handleFileTypes(const std::filesystem::directory_entry& file);

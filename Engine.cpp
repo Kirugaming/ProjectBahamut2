@@ -66,13 +66,7 @@ void Engine::engineLoop() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glClearColor(.2f, .3f, .3f, 1.0f);
 
-        for (GameObject* model : game.level->gameObjects) {
-            for (Script *script : model->scripts) {
-                script->run();
-            }
-
-            model->draw(game.camera.getView());
-        }
+        drawGameObjects(game.level->gameObjects);
 
         ui->renderUI(&game);
 
@@ -130,5 +124,16 @@ void Engine::KeyboardInput() { // possible to do this elsewhere but its here for
     }
     if (inputManager.getKeyDown("right")) {
         game.camera.setYaw(1);
+    }
+}
+
+void Engine::drawGameObjects(const std::vector<GameObject*>& gameObjects) const {
+    for (GameObject* model : gameObjects) {
+        for (Script *script : model->scripts) {
+            script->run();
+        }
+
+        model->draw(game.camera.getView());
+        drawGameObjects(model->nestedGameObjects);
     }
 }

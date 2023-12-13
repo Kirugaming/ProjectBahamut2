@@ -46,6 +46,7 @@ private:
     int initRendering(int winHeight, int winWidth); // SDL and OpenGL
     void eventMonitor();
     void KeyboardInput();
+    void drawGameObjects(const std::vector<GameObject*>& gameObjects) const;
 };
 
 

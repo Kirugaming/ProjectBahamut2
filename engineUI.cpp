@@ -46,19 +46,9 @@ void engineUI::renderUI(Game *game) {
     ImGui::Separator();
     ImGui::Text("Game Objects:");
 
-    for (auto object : game->level->gameObjects) {
-        ImGui::Image((void*)(intptr_t)icons["object"]->id, ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
-        ImGui::SameLine();
-        if (object->name.empty()) {
-            if (ImGui::Button("##")) {
-                this->selectedObject = object;
-            }
-        } else if (ImGui::TreeNode(object->name.c_str())) {
-            this->selectedObject = object;
+    drawGameObjectButton(game->level->gameObjects);
 
-            ImGui::TreePop();
-        }
-    }
+
 
     if (selectedObject != nullptr) {
         objectEditWindow(selectedObject);
@@ -220,4 +210,20 @@ std::string engineUI::drawTextInput(const std::string &inputName, std::string &t
     }
 
     return text;
+}
+
+void engineUI::drawGameObjectButton(std::vector<GameObject*> &gameObjects) {
+    for (auto& object : gameObjects) {
+        ImGui::Image((void*)(intptr_t)icons["object"]->id, ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::SameLine();
+        if (object->name.empty()) {
+            if (ImGui::Button("##")) {
+                this->selectedObject = object;
+            }
+        } else if (ImGui::TreeNode(object->name.c_str())) {
+            this->selectedObject = object;
+            drawGameObjectButton(selectedObject->nestedGameObjects);
+            ImGui::TreePop();
+        }
+    }
 }
