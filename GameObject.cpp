@@ -15,7 +15,7 @@ GameObject::GameObject(std::string name, const std::string &modelPath, glm::vec3
                        glm::vec3 scale) : shader(), name(std::move(name)),  model(*new Model(modelPath.c_str())) {
     transform = Transform();
     transform.position = position;
-    transform.rotation = glm::angleAxis(glm::radians(90.0f), rotation);
+    transform.rotation = rotation;
     transform.scale = scale;
 }
 

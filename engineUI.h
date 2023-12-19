@@ -33,10 +33,19 @@ private:
     std::map<std::string, Texture*> icons;
     GameObject *selectedObject = nullptr;
     std::unordered_set<std::string> openFolders;
+    std::string *fileDragTemp;
 
     void objectEditWindow(GameObject *gameObject);
+    void loadUiIcons();
+    static void configureNextWindowPosSize(ImVec2 position, ImVec2 size);
+    static void drawVec3Input(const std::string& inputName, glm::vec3 &vector3);
+    static std::string drawTextInput(const std::string& inputName, std::string &text);
+    void drawGameObjectButton(std::vector<GameObject*> &gameObjects);
     void projectFileExplorer();
     void displayFileTree(const std::string &path, int level);
+    void handleFileTypes(const std::filesystem::directory_entry& file);
+
+    void openFile(std::string path);
 };
 
 

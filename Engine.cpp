@@ -18,7 +18,7 @@ Engine::Engine(Project &chosenProject) : project(chosenProject) {
 
 
     // init game
-    game.camera = Camera(glm::vec3(0.0f, 1.0f, 2.0f));
+    game.camera = Camera(glm::vec3(0.0f, 2.0f, 2.0f));
 
     game.level = new Level();
 
@@ -66,9 +66,7 @@ void Engine::engineLoop() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glClearColor(.2f, .3f, .3f, 1.0f);
 
-        for (GameObject* model : game.level->gameObjects) {
-            model->draw(game.camera.getView());
-        }
+        drawGameObjects(game.level->gameObjects);
 
         ui->renderUI(&game);
 
@@ -103,28 +101,39 @@ Engine::~Engine() {
 }
 
 void Engine::KeyboardInput() { // possible to do this elsewhere but its here for now
-    if (keys[SDL_SCANCODE_W]) {
-        game.camera.movement(Camera::FORWARD, game.deltaTime);
-    }
-    if (keys[SDL_SCANCODE_S]) {
-        game.camera.movement(Camera::BACKWARD, game.deltaTime);
-    }
-    if (keys[SDL_SCANCODE_A]) {
-        game.camera.movement(Camera::LEFT, game.deltaTime);
-    }
-    if (keys[SDL_SCANCODE_D]) {
-        game.camera.movement(Camera::RIGHT, game.deltaTime);
-    }
-    if (keys[SDL_SCANCODE_UP]) {
+//    if (inputManager.getKeyDown("w")) {
+//        game.camera.movement(Camera::FORWARD, game.deltaTime);
+//    }
+//    if (inputManager.getKeyDown("s")) {
+//        game.camera.movement(Camera::BACKWARD, game.deltaTime);
+//    }
+//    if (inputManager.getKeyDown("a")) {
+//        game.camera.movement(Camera::LEFT, game.deltaTime);
+//    }
+//    if (inputManager.getKeyDown("d")) {
+//        game.camera.movement(Camera::RIGHT, game.deltaTime);
+//    }
+    if (inputManager.getKeyDown("up")) {
         game.camera.setPitch(1);
     }
-    if (keys[SDL_SCANCODE_DOWN]) {
+    if (inputManager.getKeyDown("down")) {
         game.camera.setPitch(-1);
     }
-    if (keys[SDL_SCANCODE_LEFT]) {
+    if (inputManager.getKeyDown("left")) {
         game.camera.setYaw(-1);
     }
-    if (keys[SDL_SCANCODE_RIGHT]) {
+    if (inputManager.getKeyDown("right")) {
         game.camera.setYaw(1);
+    }
+}
+
+void Engine::drawGameObjects(const std::vector<GameObject*>& gameObjects) const {
+    for (GameObject* model : gameObjects) {
+        for (Script *script : model->scripts) {
+            script->run();
+        }
+
+        model->draw(game.camera.getView());
+        drawGameObjects(model->nestedGameObjects);
     }
 }

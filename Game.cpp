@@ -8,6 +8,7 @@
 Game::Game() {
     deltaTime = 0.0f;
     lastFrame = 0.0f;
+
 }
 
 void Game::computeDeltaTime() {

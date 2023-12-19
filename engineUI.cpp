@@ -3,6 +3,7 @@
 //
 
 #include "engineUI.h"
+#include "Script.h"
 
 
 engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext){
@@ -15,10 +16,7 @@ engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext){
     ImGui_ImplSDL2_InitForOpenGL(window, glContext);
     ImGui_ImplOpenGL3_Init();
 
-    // load icons
-    icons["folderClosed"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\folder-solid.png)");
-    icons["folderOpen"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\folder-open-regular.png)");
-    icons["object"] = new Texture(R"(D:\Projects\C++\ProjectBahamut2\Assets\icons\cube-solid.png)");
+    loadUiIcons();
 }
 
 engineUI::~engineUI() {
@@ -34,17 +32,10 @@ void engineUI::renderUI(Game *game) {
 
     projectFileExplorer();
 
-    ImGuiWindowFlags guiWindowFlags = 0;
-    guiWindowFlags |= ImGuiWindowFlags_NoMove;
-    guiWindowFlags |= ImGuiWindowFlags_NoResize;
-    guiWindowFlags |= ImGuiWindowFlags_NoCollapse;
-    guiWindowFlags |= ImGuiWindowFlags_NoNav;
-    guiWindowFlags |= ImGuiWindowFlags_NoTitleBar;
+    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x -320, 0),
+                               ImVec2(320, 300));
 
-    ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 0), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(320, 300), ImGuiCond_Once);
-
-    ImGui::Begin("Game Object Editor", reinterpret_cast<bool *>(true), guiWindowFlags);
+    ImGui::Begin("Game Object Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoTitleBar);
 
     ImGui::Text("Game Object Editor");
     ImGui::SameLine();
@@ -55,17 +46,9 @@ void engineUI::renderUI(Game *game) {
     ImGui::Separator();
     ImGui::Text("Game Objects:");
 
-    for (auto object : game->level->gameObjects) {
-        ImGui::Image((void*)(intptr_t)icons["object"]->id, ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
-        ImGui::SameLine();
-        if (object->name.empty()) {
-            if (ImGui::Button("##")) {
-                this->selectedObject = object;
-            }
-        } else if (ImGui::Button(object->name.c_str())) {
-            this->selectedObject = object;
-        }
-    }
+    drawGameObjectButton(game->level->gameObjects);
+
+
 
     if (selectedObject != nullptr) {
         objectEditWindow(selectedObject);
@@ -73,7 +56,7 @@ void engineUI::renderUI(Game *game) {
 
     ImGui::End();
 
-    //ImGui::ShowDemoWindow();
+    ImGui::ShowDemoWindow();
 
 
     ImGui::Render();
@@ -81,45 +64,47 @@ void engineUI::renderUI(Game *game) {
 }
 
 void engineUI::objectEditWindow(GameObject *gameObject) {
-    ImGui::SetNextWindowSize(ImVec2(320, 300), ImGuiCond_Once);
-    ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 300), ImGuiCond_Once);
+    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 300),
+                               ImVec2(320, 300));
     ImGui::Begin("Object Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
     ImGui::Text("This is the object editor window!");
-    ImGui::Separator();
-    ImGui::Text("Object Name:");  // Where users can edit the name of game objects
-    char buffer[256];
-    strcpy(buffer, gameObject->name.c_str());
-    if (ImGui::InputText("##Object Name", buffer, 256)) {
-        gameObject->name = buffer;
-    };
+
+    gameObject->name = drawTextInput("Object Name", gameObject->name);
+
+    drawVec3Input("Object Position", gameObject->transform.position);
+    drawVec3Input("Object Rotation", gameObject->transform.rotation);
+    drawVec3Input("Object Scale", gameObject->transform.scale);
 
     ImGui::Separator();
-    // where users can change various transformation stuff
-    ImGui::Text("Object Position:");
-    glm::vec3 position = gameObject->transform.position;
-    if (ImGui::DragFloat3("##Position xyz", glm::value_ptr(position), 0.005f)) {
-        gameObject->transform.position = position;
+    ImGui::Text("Attached Scripts:");
+    for (int i = 0; i < gameObject->scripts.size(); ++i) {
+        ImGui::Text(gameObject->scripts[i]->path.filename().string().c_str());
+        ImGui::SameLine();
+        if (ImGui::Button("Delete")) {
+            gameObject->scripts.erase(gameObject->scripts.begin() + i);
+        }
     }
-    ImGui::Separator();
-    ImGui::Text("Object Rotation:");
-    glm::vec3 rotation = glm::eulerAngles(gameObject->transform.rotation);
-    if (ImGui::DragFloat3("##Rotation xyz", glm::value_ptr(rotation), 0.005f)) {
-        gameObject->transform.rotation = glm::quat(rotation);
+
+
+
+    ImGui::Button("Drop New Script Here", ImVec2(320, 50));
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DRAG_SCRIPT_FILE")) {
+            ImGui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
+            ImGui::BeginTooltip();
+            ImGui::Text("Drop Script here to add to game object");
+            ImGui::EndTooltip();
+            gameObject->scripts.push_back(new Script(static_cast<char*>(payload->Data), gameObject)); // turn the void pointer to string :)
+        }
+        ImGui::EndDragDropTarget();
     }
-    ImGui::Separator();
-    ImGui::Text("Object Scale:");
-    glm::vec3 scale = gameObject->transform.scale;
-    if (ImGui::DragFloat3("##Scale xyz", glm::value_ptr(scale), 0.005f)) {
-        gameObject->transform.scale = scale;
-    }
-    ImGui::Separator();
 
     ImGui::End();
 }
 
 void engineUI::projectFileExplorer() {
-    ImGui::SetNextWindowSize(ImVec2(320, ImGui::GetIO().DisplaySize.y), ImGuiCond_Once);
-    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
+    configureNextWindowPosSize(ImVec2(0, 0),
+                               ImVec2(320, ImGui::GetIO().DisplaySize.y));
     ImGui::Begin("Project Explorer", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
     ImGui::Text("Project Explorer");
     ImGui::Separator();
@@ -139,7 +124,7 @@ void engineUI::displayFileTree(const std::string &path, int level) {
         tabs += "-";
     }
 
-    for (const auto &file : std::filesystem::directory_iterator(path)) {
+    for (const auto &file: std::filesystem::directory_iterator(path)) {
         auto fileName = file.path().filename().string();
         ImGui::Text(tabs.c_str()); // it would be nice if UNICODE CHARACTERS WORKED
         ImGui::SameLine();
@@ -148,7 +133,8 @@ void engineUI::displayFileTree(const std::string &path, int level) {
             // find if directory is open in ui
             bool isOpen = openFolders.find(file.path().string()) != openFolders.end();
 
-            ImGui::Image((void*)(intptr_t)(isOpen ? icons["folderOpen"]->id : icons["folderClosed"]->id), ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::Image((void *) (intptr_t) (isOpen ? icons["folderOpen"]->id : icons["folderClosed"]->id),
+                         ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
             ImGui::SameLine();
 
             if (ImGui::Button(fileName.c_str())) {
@@ -164,13 +150,80 @@ void engineUI::displayFileTree(const std::string &path, int level) {
                 displayFileTree(file.path().string(), level + 1);
             }
         } else {
+            handleFileTypes(file);
+        }
+    }
+}
 
-            if (ImGui::Button(fileName.c_str())) { // do file action
-                if (fileName.substr(fileName.length()-4, fileName.length()) == "yaml") {
-                    selectedObject = nullptr;
-                    engine->game.level = new Level(file.path().string());
-                }
+void engineUI::handleFileTypes(const std::filesystem::directory_entry& file) {
+    auto fileName = file.path().filename().string();
+    std::string fileType = fileName.substr(fileName.find('.') + 1, fileName.length());
+
+    if (fileType == "lua") { // some files have drag drop and some don't
+        if (ImGui::Button(fileName.c_str())) { // do file action
+        }
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
+            ImGui::SetDragDropPayload("DRAG_SCRIPT_FILE", file.path().string().c_str(),
+                                      file.path().string().capacity()); // i don't know why capacity works and not size
+            ImGui::Text(fileName.c_str());
+            ImGui::EndDragDropSource();
+        }
+    } else { // normal button
+        if (ImGui::Button(fileName.c_str())) { // do file action
+            if (fileType == "bem") {
+                selectedObject = nullptr;
+                engine->game.level = new Level(file.path().string());
             }
+        }
+    }
+}
+
+void engineUI::loadUiIcons() {
+    icons["folderClosed"] = new Texture(R"(Assets\icons\folder-solid.png)");
+    icons["folderOpen"] = new Texture(R"(Assets\icons\folder-open-regular.png)");
+    icons["object"] = new Texture(R"(Assets\icons\cube-solid.png)");
+}
+
+void engineUI::configureNextWindowPosSize(ImVec2 position, ImVec2 size) {
+    ImGui::SetNextWindowPos(position, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(size, ImGuiCond_Once);
+}
+
+void engineUI::drawVec3Input(const std::string &inputName, glm::vec3 &vector3) {
+    ImGui::Separator();
+    ImGui::Text((inputName + ":").c_str());
+    glm::vec3 vec3Buffer = vector3;
+    if (ImGui::DragFloat3(("##" + inputName).c_str(), glm::value_ptr(vector3), 0.005f)) {
+
+    }
+}
+
+std::string engineUI::drawTextInput(const std::string &inputName, std::string &text) {
+    ImGui::Separator();
+    ImGui::Text((inputName + ":").c_str());
+
+    char buffer[256];
+    strcpy(buffer, text.c_str());
+
+    if (ImGui::InputText(("##" + inputName).c_str(), buffer, 256)) {
+        text = buffer;
+    }
+
+    return text;
+}
+
+void engineUI::drawGameObjectButton(std::vector<GameObject*> &gameObjects) {
+    for (auto& object : gameObjects) {
+        ImGui::Image((void*)(intptr_t)icons["object"]->id, ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::SameLine();
+        if (object->name.empty()) {
+            if (ImGui::Button("##")) {
+                this->selectedObject = object;
+            }
+        } else if (ImGui::TreeNode(object->name.c_str())) {
+            this->selectedObject = object;
+            drawGameObjectButton(selectedObject->nestedGameObjects);
+            ImGui::TreePop();
         }
     }
 }
