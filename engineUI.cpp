@@ -71,9 +71,9 @@ void engineUI::objectEditWindow(GameObject *gameObject) {
 
     gameObject->name = drawTextInput("Object Name", gameObject->name);
 
-    gameObject->transform.position = drawVec3Input("Object Position", gameObject->transform.position);
-    gameObject->transform.rotation = drawVec3Input("Object Rotation", gameObject->transform.rotation);
-    gameObject->transform.scale = drawVec3Input("Object Scale", gameObject->transform.scale);
+    drawVec3Input("Object Position", gameObject->transform.position);
+    drawVec3Input("Object Rotation", gameObject->transform.rotation);
+    drawVec3Input("Object Scale", gameObject->transform.scale);
 
     ImGui::Separator();
     ImGui::Text("Attached Scripts:");
@@ -189,12 +189,12 @@ void engineUI::configureNextWindowPosSize(ImVec2 position, ImVec2 size) {
     ImGui::SetNextWindowSize(size, ImGuiCond_Once);
 }
 
-glm::vec3 engineUI::drawVec3Input(const std::string &inputName, glm::vec3 &vector3) {
+void engineUI::drawVec3Input(const std::string &inputName, glm::vec3 &vector3) {
     ImGui::Separator();
     ImGui::Text((inputName + ":").c_str());
     glm::vec3 vec3Buffer = vector3;
-    if (ImGui::DragFloat3(("##" + inputName).c_str(), glm::value_ptr(vec3Buffer), 0.005f)) {
-        return vec3Buffer;
+    if (ImGui::DragFloat3(("##" + inputName).c_str(), glm::value_ptr(vector3), 0.005f)) {
+
     }
 }
 

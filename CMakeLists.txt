@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.22)
 project(ProjectBahamut)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
+add_compile_options(-Wno-error=dangling-reference) # assimp (compile bug?)
 
 # imgui
 set(IMGUI_SOURCES lib/imgui/imgui.cpp
