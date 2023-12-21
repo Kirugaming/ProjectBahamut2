@@ -24,6 +24,7 @@ Engine::Engine(Project &chosenProject) : project(chosenProject) {
 
     // init engine ui
 
+    brush = new Brush(BrushShapes::CUBE);
 }
 
 /*
@@ -66,6 +67,7 @@ void Engine::engineLoop() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glClearColor(.2f, .3f, .3f, 1.0f);
 
+        brush->draw(game.camera.getView());
         drawGameObjects(game.level->gameObjects);
 
         ui->renderUI(&game);
@@ -101,18 +103,18 @@ Engine::~Engine() {
 }
 
 void Engine::KeyboardInput() { // possible to do this elsewhere but its here for now
-//    if (inputManager.getKeyDown("w")) {
-//        game.camera.movement(Camera::FORWARD, game.deltaTime);
-//    }
-//    if (inputManager.getKeyDown("s")) {
-//        game.camera.movement(Camera::BACKWARD, game.deltaTime);
-//    }
-//    if (inputManager.getKeyDown("a")) {
-//        game.camera.movement(Camera::LEFT, game.deltaTime);
-//    }
-//    if (inputManager.getKeyDown("d")) {
-//        game.camera.movement(Camera::RIGHT, game.deltaTime);
-//    }
+    if (inputManager.getKeyDown("w")) {
+        game.camera.movement(Camera::FORWARD, game.deltaTime);
+    }
+    if (inputManager.getKeyDown("s")) {
+        game.camera.movement(Camera::BACKWARD, game.deltaTime);
+    }
+    if (inputManager.getKeyDown("a")) {
+        game.camera.movement(Camera::LEFT, game.deltaTime);
+    }
+    if (inputManager.getKeyDown("d")) {
+        game.camera.movement(Camera::RIGHT, game.deltaTime);
+    }
     if (inputManager.getKeyDown("up")) {
         game.camera.setPitch(1);
     }
@@ -128,6 +130,7 @@ void Engine::KeyboardInput() { // possible to do this elsewhere but its here for
 }
 
 void Engine::drawGameObjects(const std::vector<GameObject*>& gameObjects) const {
+
     for (GameObject* model : gameObjects) {
         for (Script *script : model->scripts) {
             script->run();

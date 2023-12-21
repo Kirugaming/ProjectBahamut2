@@ -26,7 +26,7 @@ public:
 
     void setInt(const std::string &name, int value) const;
     void editShaderWithMat4(const char *uniformName, glm::mat4 matrix) const;
-    void editShaderWithVec3(const char *uniformName, glm::vec3 &colors) const;
+    void editShaderWithVec3(const char *uniformName, glm::vec3 colors) const;
     void editShaderWithVec4(const char *uniformName, glm::vec4 &colors) const;
 
 private:

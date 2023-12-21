@@ -32,7 +32,7 @@ void engineUI::renderUI(Game *game) {
 
     projectFileExplorer();
 
-    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x -320, 0),
+    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 0),
                                ImVec2(320, 300));
 
     ImGui::Begin("Game Object Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoTitleBar);
@@ -44,9 +44,15 @@ void engineUI::renderUI(Game *game) {
     }
 
     ImGui::Separator();
-    ImGui::Text("Game Objects:");
 
-    drawGameObjectButton(game->level->gameObjects);
+    if (ImGui::TreeNode("Map Geometry")) {
+        ImGui::TreePop();
+    }
+    if (ImGui::TreeNode("Game Objects")) {
+        drawGameObjectButton(game->level->gameObjects);
+        ImGui::TreePop();
+    }
+
 
 
 

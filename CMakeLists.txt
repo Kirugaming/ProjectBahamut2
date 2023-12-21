@@ -23,7 +23,9 @@ set(SOURCE_FILES main.cpp main.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp M
         Script.cpp
         Script.h
         InputManager.cpp
-        InputManager.h)
+        InputManager.h
+        Brush.cpp
+        Brush.h)
 set(LIB_FILES glad.c)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${LIB_FILES} ${IMGUI_SOURCES})
 

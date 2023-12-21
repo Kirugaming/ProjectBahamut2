@@ -80,7 +80,7 @@ void Shader::setInt(const std::string &name, int value) const
 void Shader::editShaderWithMat4(const char *uniformName, glm::mat4 matrix) const {
     glUniformMatrix4fv(glGetUniformLocation(this->programId, uniformName), 1, GL_FALSE, glm::value_ptr(matrix));
 }
-void Shader::editShaderWithVec3(const char *uniformName, glm::vec3 &colors) const {
+void Shader::editShaderWithVec3(const char *uniformName, glm::vec3 colors) const {
     glUniform3fv(glGetUniformLocation(this->programId,uniformName),1,glm::value_ptr(colors));
 }
 

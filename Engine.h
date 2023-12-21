@@ -19,6 +19,7 @@
 #include "Game.h"
 #include "Projects.h"
 #include "InputManager.h"
+#include "Brush.h"
 
 class engineUI;
 
@@ -31,6 +32,7 @@ public:
 
     Project project;
     Game game;
+    Brush *brush;
     InputManager &inputManager = InputManager::getInstance();
     engineUI *ui;
     // Dear Imgui to be implemented
