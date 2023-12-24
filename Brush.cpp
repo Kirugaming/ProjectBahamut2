@@ -8,3 +8,8 @@
 Brush::Brush() : Mesh(cube.vertices, cube.indices, {}, {glm::vec3(1.0f, 1.0f, 1.0f)}) {
 
 }
+
+void Brush::draw(Shader &shader) {
+    shader.editShaderWithMat4("model", transform.toMat4());
+    Mesh::draw(shader);
+}

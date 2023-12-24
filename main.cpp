@@ -16,14 +16,16 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    ProjectsWindow projects;
-    projects.renderLoop();
-    if (projects.selectedProject == nullptr) {
+    auto* projects = new ProjectsWindow();
+    projects->renderLoop();
+    if (projects->selectedProject == nullptr) {
+        delete projects;
         return 0; // closed without selecting anything
     }
-    Project chosenProject = *projects.selectedProject;
+    Project chosenProject = *projects->selectedProject;
 
-    //delete &projects;
+    delete projects;
+
 
     Engine engine(chosenProject);
     engineUI ui(engine.window, engine.glContext);

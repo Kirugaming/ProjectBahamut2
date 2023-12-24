@@ -52,12 +52,13 @@ static struct Cube {
     }
 } cube;
 
-class Brush : private Mesh {
+class Brush : public Mesh {
 
 public:
     Transform transform;
 
     Brush();
+    void draw(Shader &shader);
 };
 
 

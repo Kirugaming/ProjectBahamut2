@@ -51,7 +51,7 @@ void engineUI::renderUI(Game *game) {
     }
     if (ImGui::BeginPopupContextWindow()) {
         if (ImGui::MenuItem("Add Cube Brush")) {
-            game->level->brushList.push_back(new Brush(BrushShapes::CUBE));
+            game->level->brushList.push_back(new Brush());
         }
         ImGui::EndPopup();
     }

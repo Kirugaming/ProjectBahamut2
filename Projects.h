@@ -13,13 +13,12 @@
 #include "backends/imgui_impl_sdlrenderer2.h"
 #include <yaml-cpp/yaml.h>
 
-struct Project {
+static struct Project {
     std::string name;
     std::string path;
     // last edited
 
-    Project(std::string inName, std::string inPath);
-};
+} project;
 
 class ProjectsWindow {
     SDL_Window *window = nullptr;
@@ -27,7 +26,7 @@ class ProjectsWindow {
     SDL_Event event;
 
     bool quit = false;
-    bool isMakeNewProjectOpen;
+    bool isMakeNewProjectOpen = false;
     Project *newProject = nullptr;
     std::vector<Project> projectList;
 

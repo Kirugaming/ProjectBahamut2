@@ -51,14 +51,6 @@ void ProjectsWindow::renderLoop() {
         ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
         SDL_RenderPresent(renderer);
     }
-
-    ImGui_ImplSDLRenderer2_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
-
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
 }
 
 void ProjectsWindow::makeNewProject() {
@@ -113,6 +105,15 @@ void ProjectsWindow::openProjectFile() {
 
 ProjectsWindow::~ProjectsWindow() {
 
+    ImGui_ImplSDLRenderer2_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+
+    delete newProject;
 }
 
 void ProjectsWindow::renderUi() {
@@ -138,8 +139,4 @@ void ProjectsWindow::renderUi() {
     }
 
     ImGui::End();
-}
-
-Project::Project(std::string inName, std::string inPath)  : name(std::move(inName)), path(std::move(inPath)) {
-
 }

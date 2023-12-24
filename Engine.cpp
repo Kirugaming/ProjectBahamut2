@@ -69,10 +69,10 @@ void Engine::engineLoop() {
 
 
         for (Brush *brush: game.level->brushList) {
-            brush->draw(game.camera.getView());
+            drawMeshSubClasses(brush);
         }
 
-        drawGameObjects(game.level->gameObjects);
+//        drawGameObjects(game.level->gameObjects);
 
         ui->renderUI(&game);
 
@@ -144,4 +144,11 @@ void Engine::drawGameObjects(const std::vector<GameObject*>& gameObjects) const 
         model->draw(game.camera.getView());
         drawGameObjects(model->nestedGameObjects);
     }
+}
+
+void Engine::drawMeshSubClasses(Mesh *mesh) {
+
+    baseShader.editShaderWithMat4("view", game.camera.getView());
+    baseShader.editShaderWithMat4("perspective", glm::perspective(glm::radians(45.0f), 1.88791f, 0.1f, 100.0f)); // TODO: GET ASPECT
+    mesh->draw(baseShader);
 }
