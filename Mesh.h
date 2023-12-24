@@ -40,7 +40,7 @@ public:
     Color colors;
 
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<MeshTexture> textures, Color colors);
-    void draw(Shader &shader);
+    virtual void draw(Shader &shader);
 private:
     unsigned int VAO{}, VBO{}, EBO{};
 

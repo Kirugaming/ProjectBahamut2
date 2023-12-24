@@ -15,6 +15,8 @@ Engine::Engine(Project &chosenProject) : project(chosenProject) {
         std::cout << "ENGINE_ERROR::INIT_RENDERING" << std::endl;
     }
 
+    baseShader = new Shader();
+
 
 
     // init game
@@ -24,7 +26,7 @@ Engine::Engine(Project &chosenProject) : project(chosenProject) {
 
     // init engine ui
 
-//    brush = new Brush(BrushShapes::CUBE);
+    game.level->brushList.push_back(new Brush());
 }
 
 /*
@@ -51,6 +53,7 @@ int Engine::initRendering(int winHeight, int winWidth) {
     glViewport(0, 0, winWidth / 2, winHeight / 2);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+    glEnable(GL_DEBUG_OUTPUT);
 
     return 0;
 }
@@ -69,7 +72,7 @@ void Engine::engineLoop() {
 
 
         for (Brush *brush: game.level->brushList) {
-            drawMeshSubClasses(brush);
+            drawMeshSubClass(brush);
         }
 
 //        drawGameObjects(game.level->gameObjects);
@@ -146,9 +149,10 @@ void Engine::drawGameObjects(const std::vector<GameObject*>& gameObjects) const 
     }
 }
 
-void Engine::drawMeshSubClasses(Mesh *mesh) {
-
-    baseShader.editShaderWithMat4("view", game.camera.getView());
-    baseShader.editShaderWithMat4("perspective", glm::perspective(glm::radians(45.0f), 1.88791f, 0.1f, 100.0f));
-    mesh->draw(baseShader);
+void Engine::drawMeshSubClass(Mesh *mesh) {
+    baseShader->use();
+    baseShader->editShaderWithMat4("view", game.camera.getView());
+    baseShader->editShaderWithMat4("perspective", glm::perspective(glm::radians(45.0f), 1.88791f, 0.1f, 100.0f));
+    mesh->draw(*baseShader);
+    baseShader->unUse();
 }

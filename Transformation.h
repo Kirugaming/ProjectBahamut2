@@ -18,7 +18,7 @@ struct Transform {
     Transform(const glm::vec3 &position, const glm::vec3 &rotation, const glm::vec3 &scale) : position(position),
                                                                                               rotation(rotation),
                                                                                               scale(scale) {};
-    Transform() : Transform(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f)) {};
+    Transform() : Transform(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f)) {};
 
     glm::mat4 toMat4() const;
 };

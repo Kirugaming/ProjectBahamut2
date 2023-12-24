@@ -45,12 +45,12 @@ public:
 
 
 private:
-    Shader baseShader;
+    Shader *baseShader; // make this so its made after opengl context is created
 
     int initRendering(int winHeight, int winWidth); // SDL and OpenGL
     void eventMonitor();
     void KeyboardInput();
-    void drawMeshSubClasses(Mesh *mesh);
+    void drawMeshSubClass(Mesh *mesh);
     void drawGameObjects(const std::vector<GameObject*>& gameObjects) const;
 };
 

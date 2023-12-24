@@ -58,7 +58,7 @@ public:
     Transform transform;
 
     Brush();
-    void draw(Shader &shader);
+    void draw(Shader &shader) override;
 };
 
 
