@@ -8,11 +8,13 @@
 #include <string>
 #include <yaml-cpp/yaml.h>
 #include "GameObject.h"
+#include "Brush.h"
 
 class Level {
 public:
     std::string path;
     std::vector<GameObject*> gameObjects;
+    std::vector<Brush*> brushList;
 
     Level();
     Level(const std::string& levelFile);

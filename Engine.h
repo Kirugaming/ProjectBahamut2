@@ -32,7 +32,7 @@ public:
 
     Project project;
     Game game;
-    Brush *brush;
+
     InputManager &inputManager = InputManager::getInstance();
     engineUI *ui;
     // Dear Imgui to be implemented

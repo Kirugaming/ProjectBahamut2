@@ -46,7 +46,14 @@ void engineUI::renderUI(Game *game) {
     ImGui::Separator();
 
     if (ImGui::TreeNode("Map Geometry")) {
+
         ImGui::TreePop();
+    }
+    if (ImGui::BeginPopupContextWindow()) {
+        if (ImGui::MenuItem("Add Cube Brush")) {
+            game->level->brushList.push_back(new Brush(BrushShapes::CUBE));
+        }
+        ImGui::EndPopup();
     }
     if (ImGui::TreeNode("Game Objects")) {
         drawGameObjectButton(game->level->gameObjects);

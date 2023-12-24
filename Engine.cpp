@@ -18,13 +18,13 @@ Engine::Engine(Project &chosenProject) : project(chosenProject) {
 
 
     // init game
-    game.camera = Camera(glm::vec3(0.0f, 2.0f, 2.0f));
+    game.camera = Camera(glm::vec3(0.0f, 0.0f, 2.0f));
 
     game.level = new Level();
 
     // init engine ui
 
-    brush = new Brush(BrushShapes::CUBE);
+//    brush = new Brush(BrushShapes::CUBE);
 }
 
 /*
@@ -67,7 +67,11 @@ void Engine::engineLoop() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glClearColor(.2f, .3f, .3f, 1.0f);
 
-        brush->draw(game.camera.getView());
+
+        for (Brush *brush: game.level->brushList) {
+            brush->draw(game.camera.getView());
+        }
+
         drawGameObjects(game.level->gameObjects);
 
         ui->renderUI(&game);
@@ -87,6 +91,7 @@ void Engine::eventMonitor() {
             case SDL_WINDOWEVENT:
                 switch (event.window.event) {
                     case SDL_WINDOWEVENT_RESIZED:
+
                         glViewport(event.window.data1 / 6, event.window.data2 / 3, event.window.data1 / 1.5, event.window.data2 / 1.5);
                         break;
                 }

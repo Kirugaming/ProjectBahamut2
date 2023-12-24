@@ -86,14 +86,14 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
         // model colors
         aiColor3D color;
-        material->Get(AI_MATKEY_COLOR_AMBIENT, color);
-        colors.ambient = glm::vec3(color.r,color.g,color.b);
         material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
         colors.diffuse = glm::vec3(color.r,color.g,color.b);
-        material->Get(AI_MATKEY_COLOR_EMISSIVE, color);
-        colors.emissive = glm::vec3(color.r,color.g,color.b);
-        material->Get(AI_MATKEY_COLOR_SPECULAR, color);
-        colors.specular = glm::vec3(color.r,color.g,color.b);
+//        material->Get(AI_MATKEY_COLOR_AMBIENT, color);
+//        colors.ambient = glm::vec3(color.r,color.g,color.b);
+//        material->Get(AI_MATKEY_COLOR_EMISSIVE, color);
+//        colors.emissive = glm::vec3(color.r,color.g,color.b);
+//        material->Get(AI_MATKEY_COLOR_SPECULAR, color);
+//        colors.specular = glm::vec3(color.r,color.g,color.b);
     }
 
     return {vertices, indices, textures, colors};
