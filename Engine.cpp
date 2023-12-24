@@ -149,6 +149,6 @@ void Engine::drawGameObjects(const std::vector<GameObject*>& gameObjects) const 
 void Engine::drawMeshSubClasses(Mesh *mesh) {
 
     baseShader.editShaderWithMat4("view", game.camera.getView());
-    baseShader.editShaderWithMat4("perspective", glm::perspective(glm::radians(45.0f), 1.88791f, 0.1f, 100.0f)); // TODO: GET ASPECT
+    baseShader.editShaderWithMat4("perspective", glm::perspective(glm::radians(45.0f), 1.88791f, 0.1f, 100.0f));
     mesh->draw(baseShader);
 }
