@@ -11,6 +11,7 @@
 
 
 void Model::draw(Shader &shader) {
+    shader.editShaderWithMat4("model", transform.toMat4());
     for (auto & mesh : meshes) {
         mesh.draw(shader);
     }

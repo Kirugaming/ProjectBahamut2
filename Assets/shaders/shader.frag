@@ -8,5 +8,10 @@ uniform vec3 colors;
 
 void main()
 {
-    fragColor = vec4(colors, 1.0) * texture(texture_diffuse1, texCoords);
+    if (texture(texture_diffuse1, texCoords).r > 0.0) {
+        fragColor = texture(texture_diffuse1, texCoords);
+    } else {
+        fragColor = vec4(colors, 1.0);
+    }
+
 }

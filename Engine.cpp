@@ -26,7 +26,6 @@ Engine::Engine(Project &chosenProject) : project(chosenProject) {
 
     // init engine ui
 
-    game.level->brushList.push_back(new Brush());
 }
 
 /*
@@ -71,11 +70,15 @@ void Engine::engineLoop() {
         glClearColor(.2f, .3f, .3f, 1.0f);
 
 
+
+        baseShader->use();
         for (Brush *brush: game.level->brushList) {
             drawMeshSubClass(brush);
         }
+        drawGameObjects(game.level->gameObjects);
+        baseShader->unUse();
 
-//        drawGameObjects(game.level->gameObjects);
+
 
         ui->renderUI(&game);
 
@@ -138,21 +141,22 @@ void Engine::KeyboardInput() { // possible to do this elsewhere but its here for
 }
 
 void Engine::drawGameObjects(const std::vector<GameObject*>& gameObjects) const {
-
     for (GameObject* model : gameObjects) {
         for (Script *script : model->scripts) {
             script->run();
         }
 
-        model->draw(game.camera.getView());
+        baseShader->editShaderWithMat4("view", game.camera.getView());
+        baseShader->editShaderWithMat4("perspective", glm::perspective(glm::radians(45.0f), 1.88791f, 0.1f, 100.0f));
+        model->draw(*baseShader);
+
         drawGameObjects(model->nestedGameObjects);
     }
 }
 
 void Engine::drawMeshSubClass(Mesh *mesh) {
-    baseShader->use();
     baseShader->editShaderWithMat4("view", game.camera.getView());
     baseShader->editShaderWithMat4("perspective", glm::perspective(glm::radians(45.0f), 1.88791f, 0.1f, 100.0f));
     mesh->draw(*baseShader);
-    baseShader->unUse();
+
 }

@@ -27,7 +27,7 @@ struct Color {
 //    glm::vec3 specular;
 };
 
-struct MeshTexture {
+struct MeshTexture { // to be changed later
     Texture *texture;
     std::string type;
 };
@@ -40,6 +40,7 @@ public:
     Color colors;
 
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<MeshTexture> textures, Color colors);
+
     virtual void draw(Shader &shader);
 private:
     unsigned int VAO{}, VBO{}, EBO{};

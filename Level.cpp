@@ -28,7 +28,7 @@ void Level::save() const {
     YAML::Node map;
     for (int i = 0; i < gameObjects.size(); i++) {
         map["GameObjects"][i]["name"] = gameObjects[i]->name;
-        map["GameObjects"][i]["model"] = gameObjects[i]->model.modelPath;
+        map["GameObjects"][i]["model"] = gameObjects[i]->modelPath;
         // position
         map["GameObjects"][i]["position"][0] = gameObjects[i]->transform.position.x;
         map["GameObjects"][i]["position"][1] = gameObjects[i]->transform.position.y;

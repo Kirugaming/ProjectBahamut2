@@ -9,6 +9,7 @@
 #include <vector>
 #include "Shader.h"
 #include "Mesh.h"
+#include "Transformation.h"
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
@@ -16,12 +17,16 @@
 
 class Model {
 public:
+    Transform transform;
+
     explicit Model(const char *path) {
         modelPath = path;
         loadModel(path);
     }
+
+    virtual void draw(Shader &shader);
+
     std::string modelPath;
-    void draw(Shader &shader);
 private:
 
     std::vector<Mesh> meshes;
