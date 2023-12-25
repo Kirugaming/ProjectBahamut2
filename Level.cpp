@@ -10,7 +10,11 @@ Level::Level(const std::string& levelFile) {
     path = levelFile;
     try {
         YAML::Node level = YAML::LoadFile(levelFile);
-        
+
+        // go
+        for (auto &&object : level["Brushes"]) {
+            brushList.push_back(addBrush(object));
+        }
         // go through game objects
         for (auto &&object : level["GameObjects"]) {
             gameObjects.push_back(addGameObject(object));
@@ -26,6 +30,23 @@ void Level::save() const {
     file << "# -ProjectBahamut Map File-\n# You can edit the map through this file or the engine\n";
 
     YAML::Node map;
+    for (int i = 0; i < brushList.size(); ++i) {
+        map["Brushes"][i]["name"] = brushList[i]->name;
+        // position
+        map["Brushes"][i]["position"][0] = gameObjects[i]->transform.position.x;
+        map["Brushes"][i]["position"][1] = gameObjects[i]->transform.position.y;
+        map["Brushes"][i]["position"][2] = gameObjects[i]->transform.position.z;
+        // rotation
+        glm::vec3 vecRotation = gameObjects[i]->transform.rotation;
+        map["Brushes"][i]["rotation"][0] = vecRotation.x;
+        map["Brushes"][i]["rotation"][1] = vecRotation.y;
+        map["Brushes"][i]["rotation"][2] = vecRotation.z;
+        // scale
+        map["Brushes"][i]["scale"][0] = gameObjects[i]->transform.scale.x;
+        map["Brushes"][i]["scale"][1] = gameObjects[i]->transform.scale.y;
+        map["Brushes"][i]["scale"][2] = gameObjects[i]->transform.scale.z;
+    }
+
     for (int i = 0; i < gameObjects.size(); i++) {
         map["GameObjects"][i]["name"] = gameObjects[i]->name;
         map["GameObjects"][i]["model"] = gameObjects[i]->modelPath;
@@ -66,10 +87,20 @@ GameObject* Level::addGameObject(const YAML::Node &object) {
         newGameObject->scripts.push_back(new Script(object["scripts"][i].as<std::string>(), newGameObject));
     }
 
-    for (int i = 0; i < object["nestedObjects"].size(); ++i) {
-        newGameObject->nestedGameObjects.push_back(
-                addGameObject(object["nestedObjects"][i]));
-    }
+//    for (int i = 0; i < object["nestedObjects"].size(); ++i) {
+//        newGameObject->nestedGameObjects.push_back(
+//                addGameObject(object["nestedObjects"][i]));
+//    }
 
     return newGameObject;
+}
+
+Brush *Level::addBrush(const YAML::Node &object) {
+    auto *newBrush = new Brush(
+            object["name"].as<std::string>(),
+                    Transform(glm::vec3(object["position"][0].as<float>(), object["position"][1].as<float>(), object["position"][2].as<float>()),
+                              glm::vec3(object["rotation"][0].as<float>(), object["rotation"][1].as<float>(), object["rotation"][2].as<float>()),
+                              glm::vec3(object["scale"][0].as<float>(), object["scale"][1].as<float>(), object["scale"][2].as<float>()))
+            );
+    return newBrush;
 }

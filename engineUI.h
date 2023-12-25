@@ -32,10 +32,12 @@ public:
 private:
     std::map<std::string, Texture*> icons;
     GameObject *selectedObject = nullptr;
+    Brush *selectedBrush = nullptr;
     std::unordered_set<std::string> openFolders;
     std::string *fileDragTemp;
 
     void objectEditWindow(GameObject *gameObject);
+    void brushEditWindow(Brush *brush);
     void loadUiIcons();
     static void configureNextWindowPosSize(ImVec2 position, ImVec2 size);
     static void drawVec3Input(const std::string& inputName, glm::vec3 &vector3);

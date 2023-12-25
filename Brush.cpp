@@ -6,10 +6,14 @@
 #include "glad/glad.h"
 
 Brush::Brush() : Mesh(cube.vertices, cube.indices, {}, {glm::vec3(1.0f, 1.0f, 1.0f)}) {
-
 }
 
 void Brush::draw(Shader &shader) {
     shader.editShaderWithMat4("model", transform.toMat4());
     Mesh::draw(shader);
+}
+
+Brush::Brush(std::string name, Transform transform1) : name(std::move(name)), Mesh(cube.vertices, cube.indices, {}, {glm::vec3(1.0f, 1.0f, 1.0f)}) {
+    transform = *new Transform(transform1);
+
 }

@@ -46,7 +46,19 @@ void engineUI::renderUI(Game *game) {
     ImGui::Separator();
 
     if (ImGui::TreeNode("Map Geometry")) {
-
+        for (Brush *brush : game->level->brushList) {
+            if (brush->name.empty()) {
+                if (ImGui::Button("##")) {
+                    selectedObject = nullptr;
+                    this->selectedBrush = brush;
+                }
+            } else {
+                if (ImGui::Button(brush->name.c_str())) {
+                    selectedObject = nullptr;
+                    selectedBrush = brush;
+                }
+            }
+        }
         ImGui::TreePop();
     }
     if (ImGui::BeginPopupContextWindow()) {
@@ -64,7 +76,12 @@ void engineUI::renderUI(Game *game) {
 
 
     if (selectedObject != nullptr) {
+
         objectEditWindow(selectedObject);
+    }
+    if (selectedBrush != nullptr) {
+
+        brushEditWindow(selectedBrush);
     }
 
     ImGui::End();
@@ -231,12 +248,30 @@ void engineUI::drawGameObjectButton(std::vector<GameObject*> &gameObjects) {
         ImGui::SameLine();
         if (object->name.empty()) {
             if (ImGui::Button("##")) {
+                selectedBrush = nullptr;
                 this->selectedObject = object;
             }
         } else if (ImGui::TreeNode(object->name.c_str())) {
             this->selectedObject = object;
+            selectedBrush = nullptr;
             drawGameObjectButton(selectedObject->nestedGameObjects);
             ImGui::TreePop();
         }
     }
+}
+
+void engineUI::brushEditWindow(Brush *brush) {
+    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 300),
+                               ImVec2(320, 300));
+
+    ImGui::Begin("Object Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+    ImGui::Text("This is the object editor window!");
+
+    brush->name = drawTextInput("Object Name", brush->name);
+
+    drawVec3Input("Object Position", brush->transform.position);
+    drawVec3Input("Object Rotation", brush->transform.rotation);
+    drawVec3Input("Object Scale", brush->transform.scale);
+
+    ImGui::End();
 }

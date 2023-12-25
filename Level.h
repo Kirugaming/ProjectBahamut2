@@ -24,6 +24,7 @@ public:
 
 private:
     static GameObject* addGameObject(const YAML::Node& object);
+    Brush* addBrush(const YAML::Node& object);
 };
 
 

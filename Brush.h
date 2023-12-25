@@ -55,9 +55,11 @@ static struct Cube {
 class Brush : public Mesh {
 
 public:
+    std::string name;
     Transform transform;
 
     Brush();
+    Brush(std::string name, Transform transform1);
     void draw(Shader &shader) override;
 };
 
