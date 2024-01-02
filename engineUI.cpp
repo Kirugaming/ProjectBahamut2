@@ -276,9 +276,32 @@ void engineUI::brushEditWindow(Brush *brush) {
 
     brush->name = drawTextInput("Object Name", brush->name);
 
-    drawVec3Input("Object Position", brush->transform.position);
+    ImGui::Separator();
+    ImGui::Checkbox("Snapping enabled for this brush", &brush->isSnapEnabled);
+
+
+    ImGui::Separator();
+    if (brush->isSnapEnabled) {
+        ImGui::Text("Object Position:");
+        if (ImGui::DragFloat3("##Object Position", glm::value_ptr(brush->transform.position), 1.0f)) {
+        }
+    } else {
+        drawVec3Input("Object Position", brush->transform.position); // normal drag
+    }
     drawVec3Input("Object Rotation", brush->transform.rotation);
-    drawVec3Input("Object Scale", brush->transform.scale);
+
+    ImGui::Separator();
+    if (brush->isSnapEnabled) {
+        ImGui::Text("Object Scale:");
+        if (ImGui::DragFloat3("##Object Scale", glm::value_ptr(brush->transform.scale), 1.0f)) {
+        }
+    } else {
+        drawVec3Input("Object Scale", brush->transform.scale); // normal drag
+    }
+
+    if (brush->isSnapEnabled) {
+        brush->snapToWholeVerts();
+    }
 
     ImGui::End();
 }

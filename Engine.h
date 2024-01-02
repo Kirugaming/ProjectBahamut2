@@ -38,6 +38,7 @@ public:
     WindowSize windowSize;
     Project project;
     Game game;
+    bool isWireframeModeEnabled = false;
 
     InputManager &inputManager = InputManager::getInstance();
     engineUI *ui;

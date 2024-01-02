@@ -76,9 +76,19 @@ void Engine::engineLoop() {
 
 
         baseShader->use();
+
+        if (isWireframeModeEnabled) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+
         for (Brush *brush: game.level->brushList) {
             drawMeshSubClass(brush);
         }
+
+        if (isWireframeModeEnabled) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+
         drawGameObjects(game.level->gameObjects);
         baseShader->unUse();
 
@@ -143,6 +153,13 @@ void Engine::KeyboardInput() { // possible to do this elsewhere but its here for
     }
     if (inputManager.getKeyDown("right")) {
         game.camera.setYaw(1);
+    }
+    if (inputManager.getKeyDown("tab")) {
+        if (isWireframeModeEnabled) {
+            isWireframeModeEnabled = false;
+        } else {
+            isWireframeModeEnabled = true;
+        }
     }
 }
 

@@ -57,12 +57,14 @@ class Brush : public Mesh {
 public:
     std::string name;
     Transform transform;
+    bool isSnapEnabled = true;
 
     Brush();
     Brush(std::string name, Transform transform1);
 
     void draw(Shader &shader) override;
     void applyTransformVertices();
+    void snapToWholeVerts();
 };
 
 

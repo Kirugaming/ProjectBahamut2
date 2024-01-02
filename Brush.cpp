@@ -31,3 +31,10 @@ void Brush::applyTransformVertices() {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
+void Brush::snapToWholeVerts() {
+    if (isSnapEnabled) {
+        transform.position = glm::floor(transform.position);
+        transform.scale = glm::floor(transform.scale);
+    }
+}
