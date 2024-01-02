@@ -20,6 +20,7 @@ class Engine;
 
 
 
+
 class engineUI {
 public:
     Engine *engine;
@@ -30,11 +31,13 @@ public:
     void renderUI(Game *game);
 
 private:
+
     std::map<std::string, Texture*> icons;
     GameObject *selectedObject = nullptr;
     Brush *selectedBrush = nullptr;
     std::unordered_set<std::string> openFolders;
     std::string *fileDragTemp;
+
 
     void objectEditWindow(GameObject *gameObject);
     void brushEditWindow(Brush *brush);

@@ -9,11 +9,25 @@ Brush::Brush() : Mesh(cube.vertices, cube.indices, {}, {glm::vec3(1.0f, 1.0f, 1.
 }
 
 void Brush::draw(Shader &shader) {
-    shader.editShaderWithMat4("model", transform.toMat4());
+    applyTransformVertices();
     Mesh::draw(shader);
 }
 
 Brush::Brush(std::string name, Transform transform1) : name(std::move(name)), Mesh(cube.vertices, cube.indices, {}, {glm::vec3(1.0f, 1.0f, 1.0f)}) {
     transform = *new Transform(transform1);
 
+}
+
+void Brush::applyTransformVertices() {
+    glm::mat4 model = transform.toMat4();
+
+    for (int i = 0; i < vertices.size(); ++i) {
+        vertices[i].position = glm::vec3(model * glm::vec4(cube.vertices[i].position, 1.0f));
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    glNamedBufferSubData(VBO, 0, static_cast<GLsizeiptr>(vertices.size() * sizeof(Vertex)), vertices.data());
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

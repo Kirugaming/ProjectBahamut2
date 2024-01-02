@@ -60,7 +60,9 @@ public:
 
     Brush();
     Brush(std::string name, Transform transform1);
+
     void draw(Shader &shader) override;
+    void applyTransformVertices();
 };
 
 

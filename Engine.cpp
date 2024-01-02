@@ -7,11 +7,11 @@
 #include "backends/imgui_impl_opengl3.h"
 
 
-Engine::Engine(Project &chosenProject) : project(chosenProject) {
+Engine::Engine(Project &chosenProject) : project(chosenProject), windowSize(displayMode.h-50, (displayMode.w) != 0) {
     SDL_GetCurrentDisplayMode(0, &displayMode);
     if (initRendering(
-            (displayMode.h-50),
-            (displayMode.w) != 0)) {
+            (int) windowSize.height,
+            (int) windowSize.width)) {
         std::cout << "ENGINE_ERROR::INIT_RENDERING" << std::endl;
     }
 
@@ -25,6 +25,11 @@ Engine::Engine(Project &chosenProject) : project(chosenProject) {
     game.level = new Level();
 
     // init engine ui
+
+    glViewport(windowSize.height / 6, windowSize.width / 6, windowSize.height / 1.5, windowSize.width / 1.5);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_DEBUG_OUTPUT);
 
 }
 
@@ -49,10 +54,9 @@ int Engine::initRendering(int winHeight, int winWidth) {
     }
 
     // OpenGL rendering settings
-    glViewport(0, 0, winWidth / 2, winHeight / 2);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_DEBUG_OUTPUT);
+//    viewportPosHW += glm::vec4(winWidth/ 6, winHeight / 3, winWidth / 1.5, winHeight / 1.5);
+//    std::cout << viewportPosHW.x << " " << viewportPosHW.y << " " << viewportPosHW.z << " " << viewportPosHW.w << " " << std::endl;
+
 
     return 0;
 }
@@ -97,8 +101,10 @@ void Engine::eventMonitor() {
             case SDL_WINDOWEVENT:
                 switch (event.window.event) {
                     case SDL_WINDOWEVENT_RESIZED:
-
-                        glViewport(event.window.data1 / 6, event.window.data2 / 3, event.window.data1 / 1.5, event.window.data2 / 1.5);
+                        windowSize.height = event.window.data1;
+                        windowSize.width = event.window.data2;
+//                        viewportPosHW = glm::vec4(event.window.data1/ 6, event.window.data2 / 3, event.window.data1 / 1.5, event.window.data2 / 1.5);
+//                        glViewport(viewportPosHW.x, viewportPosHW.y, viewportPosHW.z, viewportPosHW.w);
                         break;
                 }
                 break;

@@ -5,7 +5,6 @@
 #ifndef PROJECTBAHAMUT_ENGINE_H
 #define PROJECTBAHAMUT_ENGINE_H
 
-// provides blueprint for keyboard input, game editor window, and engine UI
 
 
 #include <vector>
@@ -23,6 +22,11 @@
 
 class engineUI;
 
+static struct WindowSize {
+    int height;
+    int width;
+} windowSize;
+
 class Engine {
 public:
     SDL_DisplayMode displayMode;
@@ -30,11 +34,15 @@ public:
     SDL_GLContext glContext = nullptr;
     SDL_Event event;
 
+
+    WindowSize windowSize;
     Project project;
     Game game;
 
     InputManager &inputManager = InputManager::getInstance();
     engineUI *ui;
+
+
     // Dear Imgui to be implemented
     Engine(Project &chosenProject);
     ~Engine();

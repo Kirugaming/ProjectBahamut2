@@ -42,9 +42,9 @@ public:
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<MeshTexture> textures, Color colors);
 
     virtual void draw(Shader &shader);
-private:
+protected:
     unsigned int VAO{}, VBO{}, EBO{};
-
+private:
     void setupMesh();
 };
 

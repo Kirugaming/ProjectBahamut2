@@ -6,7 +6,7 @@
 #include "Script.h"
 
 
-engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext){
+engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext) {
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -15,6 +15,12 @@ engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext){
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, glContext);
     ImGui_ImplOpenGL3_Init();
+
+    // setup top down brush viewer
+
+
+
+
 
     loadUiIcons();
 }
@@ -26,6 +32,7 @@ engineUI::~engineUI() {
 }
 
 void engineUI::renderUI(Game *game) {
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
