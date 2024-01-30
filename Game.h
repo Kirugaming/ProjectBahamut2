@@ -8,14 +8,14 @@
 
 #include <chrono>
 #include "Camera.h"
-#include "Level.h"
+#include "Map.h"
 
 class Game {
 
 public:
     bool quit{};
     Camera camera;
-    Level *level = nullptr;
+    Map *level = nullptr;
     float deltaTime;
     float lastFrame;
 

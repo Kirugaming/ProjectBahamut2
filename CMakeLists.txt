@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.22)
 project(ProjectBahamut)
 
 set(CMAKE_CXX_STANDARD 20)
-add_compile_options(-Wno-error=dangling-reference) # assimp (compile bug?)
+#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++ -static-libgcc")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+#add_compile_options(-Wno-error=dangling-reference) # assimp (compile bug?)
 
 # imgui
 set(IMGUI_SOURCES lib/imgui/imgui.cpp
@@ -17,7 +19,7 @@ set(IMGUI_SOURCES lib/imgui/imgui.cpp
 include_directories(lib/imgui)
 
 # Must set the path to the main.cpp, for example: scripts/main.cpp if it is inside a folder
-set(SOURCE_FILES main.cpp main.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp Model.h Transformation.cpp Transformation.h GameObject.cpp GameObject.h Camera.cpp Camera.h Engine.h Engine.cpp Level.cpp Level.h engineUI.cpp engineUI.h Projects.cpp Projects.h Game.cpp Game.h
+set(SOURCE_FILES main.cpp main.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp Model.h Transformation.cpp Transformation.h GameObject.cpp GameObject.h Camera.cpp Camera.h Engine.h Engine.cpp Map.cpp Map.h engineUI.cpp engineUI.h Projects.cpp Projects.h Game.cpp Game.h
         Texture.cpp
         Texture.h
         Script.cpp
@@ -25,7 +27,8 @@ set(SOURCE_FILES main.cpp main.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp M
         InputManager.cpp
         InputManager.h
         Brush.cpp
-        Brush.h)
+        Brush.h
+)
 set(LIB_FILES glad.c)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${LIB_FILES} ${IMGUI_SOURCES})
 

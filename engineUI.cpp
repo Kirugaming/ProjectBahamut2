@@ -53,19 +53,19 @@ void engineUI::renderUI(Game *game) {
     ImGui::Separator();
 
     if (ImGui::TreeNode("Map Geometry")) {
-        for (Brush *brush : game->level->brushList) {
-            if (brush->name.empty()) {
-                if (ImGui::Button("##")) {
-                    selectedObject = nullptr;
-                    this->selectedBrush = brush;
-                }
-            } else {
-                if (ImGui::Button(brush->name.c_str())) {
-                    selectedObject = nullptr;
-                    selectedBrush = brush;
-                }
-            }
-        }
+//        for (Brush *brush : game->level->brushList) {
+//            if (brush->id == ) {
+//                if (ImGui::Button("##")) {
+//                    selectedObject = nullptr;
+//                    this->selectedBrush = brush;
+//                }
+//            } else {
+//                if (ImGui::Button(brush->name.c_str())) {
+//                    selectedObject = nullptr;
+//                    selectedBrush = brush;
+//                }
+//            }
+//        }
         ImGui::TreePop();
     }
     if (ImGui::BeginPopupContextWindow()) {
@@ -209,7 +209,7 @@ void engineUI::handleFileTypes(const std::filesystem::directory_entry& file) {
         if (ImGui::Button(fileName.c_str())) { // do file action
             if (fileType == "bem") {
                 selectedObject = nullptr;
-                engine->game.level = new Level(file.path().string());
+                engine->game.level = new Map(file.path().string());
             }
         }
     }
@@ -274,7 +274,7 @@ void engineUI::brushEditWindow(Brush *brush) {
     ImGui::Begin("Object Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
     ImGui::Text("This is the object editor window!");
 
-    brush->name = drawTextInput("Object Name", brush->name);
+//    brush->name = drawTextInput("Object Name", brush->name);
 
     ImGui::Separator();
     ImGui::Checkbox("Snapping enabled for this brush", &brush->isSnapEnabled);

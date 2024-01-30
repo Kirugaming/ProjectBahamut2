@@ -9,6 +9,7 @@
 #include "Transformation.h"
 #include "Shader.h"
 #include "Mesh.h"
+#include "yaml-cpp/node/node.h"
 
 enum BrushShapes {
     CUBE = 0,
@@ -55,16 +56,19 @@ static struct Cube {
 class Brush : public Mesh {
 
 public:
-    std::string name;
+    int id;
     Transform transform;
     bool isSnapEnabled = true;
 
     Brush();
-    Brush(std::string name, Transform transform1);
+    Brush(std::vector<Vertex> &inVertices, std::vector<unsigned int> &inIndices, Transform &inTransform);
+    Brush(int id, Transform transform1);
 
     void draw(Shader &shader) override;
     void applyTransformVertices();
     void snapToWholeVerts();
+
+    std::stringstream writeToString();
 };
 
 

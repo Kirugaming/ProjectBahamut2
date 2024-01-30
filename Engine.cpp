@@ -21,8 +21,7 @@ Engine::Engine(Project &chosenProject) : project(chosenProject), windowSize(disp
 
     // init game
     game.camera = Camera(glm::vec3(0.0f, 0.0f, 2.0f));
-
-    game.level = new Level();
+    game.level = new Map();
 
     // init engine ui
 
@@ -53,11 +52,6 @@ int Engine::initRendering(int winHeight, int winWidth) {
         return -1;
     }
 
-    // OpenGL rendering settings
-//    viewportPosHW += glm::vec4(winWidth/ 6, winHeight / 3, winWidth / 1.5, winHeight / 1.5);
-//    std::cout << viewportPosHW.x << " " << viewportPosHW.y << " " << viewportPosHW.z << " " << viewportPosHW.w << " " << std::endl;
-
-
     return 0;
 }
 
@@ -73,26 +67,14 @@ void Engine::engineLoop() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glClearColor(.2f, .3f, .3f, 1.0f);
 
-
-
         baseShader->use();
-
-        if (isWireframeModeEnabled) {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        }
 
         for (Brush *brush: game.level->brushList) {
             drawMeshSubClass(brush);
         }
 
-        if (isWireframeModeEnabled) {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
-
         drawGameObjects(game.level->gameObjects);
         baseShader->unUse();
-
-
 
         ui->renderUI(&game);
 
@@ -113,8 +95,6 @@ void Engine::eventMonitor() {
                     case SDL_WINDOWEVENT_RESIZED:
                         windowSize.height = event.window.data1;
                         windowSize.width = event.window.data2;
-//                        viewportPosHW = glm::vec4(event.window.data1/ 6, event.window.data2 / 3, event.window.data1 / 1.5, event.window.data2 / 1.5);
-//                        glViewport(viewportPosHW.x, viewportPosHW.y, viewportPosHW.z, viewportPosHW.w);
                         break;
                 }
                 break;
