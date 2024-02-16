@@ -13,8 +13,10 @@
 class Texture {
 
 public:
-    explicit Texture(const std::string& filePath);
-
     unsigned int id;
     std::string path;
+
+    explicit Texture(const char* filePath);
+
+
 };

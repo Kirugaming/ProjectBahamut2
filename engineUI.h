@@ -5,7 +5,6 @@
 #ifndef PROJECTBAHAMUT_ENGINEUI_H
 #define PROJECTBAHAMUT_ENGINEUI_H
 
-struct Game;
 
 #include "SDL_video.h"
 #include "imgui.h"
@@ -14,44 +13,54 @@ struct Game;
 #include "Engine.h"
 #include <filesystem>
 #include <unordered_set>
+#include <map>
 
 class Project;
 class Engine;
 
-
-
+static const std::map<std::string, Texture> *ICONS = nullptr;
 
 class engineUI {
+    struct EditWindow {
+        void draw();
+        void setSelected(GameObject *gameObject);
+        void setSelected(Brush *brush);
+        void clearSelected();
+    private:
+        GameObject *selectedObject = nullptr;
+        Brush *selectedBrush = nullptr;
+
+        void objectEditDraw();
+        void brushEditDraw();
+        static void drawVec3Input(const std::string& inputName, glm::vec3 &vector3);
+        static std::string drawTextInput(const std::string& inputName, std::string &text);
+        void drawGameObjectButton(std::vector<GameObject*> &gameObjects);
+    };
+
+    struct FileExplorerWindow {
+        void draw();
+    private:
+        static std::unordered_set<std::string> openFolders;
+        std::string *fileDragTemp;
+
+        void displayFileTree(const std::string &path, int level);
+        void handleFileTypes(const std::filesystem::directory_entry& file);
+    };
+
+
+    static EditWindow editWindow;
+    static FileExplorerWindow fileExplorerWindow;
+
+    static void configureNextWindowPosSize(ImVec2 position, ImVec2 size);
+    static void initIcons();
+
 public:
-    Engine *engine;
+    static Engine *engine;
 
     engineUI(SDL_Window *window, SDL_GLContext &glContext);
     ~engineUI();
 
-    void renderUI(Game *game);
-
-private:
-
-    std::map<std::string, Texture*> icons;
-    GameObject *selectedObject = nullptr;
-    Brush *selectedBrush = nullptr;
-    std::unordered_set<std::string> openFolders;
-    std::string *fileDragTemp;
-
-
-    void objectEditWindow(GameObject *gameObject);
-    void brushEditWindow(Brush *brush);
-    void loadUiIcons();
-    static void configureNextWindowPosSize(ImVec2 position, ImVec2 size);
-    static void drawVec3Input(const std::string& inputName, glm::vec3 &vector3);
-    static std::string drawTextInput(const std::string& inputName, std::string &text);
-    void drawGameObjectButton(std::vector<GameObject*> &gameObjects);
-    void projectFileExplorer();
-    void displayFileTree(const std::string &path, int level);
-    void handleFileTypes(const std::filesystem::directory_entry& file);
-
-    void openFile(std::string path);
+    static void renderUI();
 };
-
 
 #endif //PROJECTBAHAMUT_ENGINEUI_H

@@ -7,29 +7,19 @@
 #include "backends/imgui_impl_opengl3.h"
 
 
-Engine::Engine(Project &chosenProject) : project(chosenProject), windowSize(displayMode.h-50, (displayMode.w) != 0) {
+Engine::Engine(Project &chosenProject) : project(chosenProject) {
     SDL_GetCurrentDisplayMode(0, &displayMode);
     if (initRendering(
             (int) windowSize.height,
             (int) windowSize.width)) {
-        std::cout << "ENGINE_ERROR::INIT_RENDERING" << std::endl;
+        std::cerr << "ENGINE_ERROR::INIT_RENDERING" << std::endl;
     }
 
     baseShader = new Shader();
 
-
-
-    // init game
-    game.camera = Camera(glm::vec3(0.0f, 0.0f, 2.0f));
-    game.level = new Map();
-
-    // init engine ui
-
-    glViewport(windowSize.height / 6, windowSize.width / 6, windowSize.height / 1.5, windowSize.width / 1.5);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glEnable(GL_DEBUG_OUTPUT);
-
 }
 
 /*
@@ -48,7 +38,7 @@ int Engine::initRendering(int winHeight, int winWidth) {
     glContext = SDL_GL_CreateContext(window);
     // Init Glad
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(SDL_GL_GetProcAddress))) {
-        std::cout << "Glad failed to Initialize!" << std::endl;
+        std::cerr << "Glad failed to Initialize!" << std::endl;
         return -1;
     }
 
@@ -56,8 +46,8 @@ int Engine::initRendering(int winHeight, int winWidth) {
 }
 
 void Engine::engineLoop() {
-    while(!game.quit){
-        game.computeDeltaTime();
+    while(!quit) {
+        deltaTime.update();
 
         // Events
         SDL_PumpEvents();
@@ -69,14 +59,14 @@ void Engine::engineLoop() {
 
         baseShader->use();
 
-        for (Brush *brush: game.level->brushList) {
+        for (Brush *brush: map.brushList) {
             drawMeshSubClass(brush);
         }
+        drawGameObjects(map.gameObjects);
 
-        drawGameObjects(game.level->gameObjects);
         baseShader->unUse();
 
-        ui->renderUI(&game);
+        ui->renderUI();
 
         SDL_GL_SwapWindow(window);
     }
@@ -88,7 +78,7 @@ void Engine::eventMonitor() {
         ImGui_ImplSDL2_ProcessEvent(&event); // Forward your event to backend
         switch (event.type) {
             case SDL_QUIT:
-                game.quit = true;
+                quit = true;
                 break;
             case SDL_WINDOWEVENT:
                 switch (event.window.event) {
@@ -111,35 +101,28 @@ Engine::~Engine() {
 
 void Engine::KeyboardInput() { // possible to do this elsewhere but its here for now
     if (inputManager.getKeyDown("w")) {
-        game.camera.movement(Camera::FORWARD, game.deltaTime);
+        camera.movement(Camera::FORWARD, deltaTime.get());
     }
     if (inputManager.getKeyDown("s")) {
-        game.camera.movement(Camera::BACKWARD, game.deltaTime);
+        camera.movement(Camera::BACKWARD, deltaTime.get());
     }
     if (inputManager.getKeyDown("a")) {
-        game.camera.movement(Camera::LEFT, game.deltaTime);
+        camera.movement(Camera::LEFT, deltaTime.get());
     }
     if (inputManager.getKeyDown("d")) {
-        game.camera.movement(Camera::RIGHT, game.deltaTime);
+        camera.movement(Camera::RIGHT, deltaTime.get());
     }
     if (inputManager.getKeyDown("up")) {
-        game.camera.setPitch(1);
+        camera.setPitch(1);
     }
     if (inputManager.getKeyDown("down")) {
-        game.camera.setPitch(-1);
+        camera.setPitch(-1);
     }
     if (inputManager.getKeyDown("left")) {
-        game.camera.setYaw(-1);
+        camera.setYaw(-1);
     }
     if (inputManager.getKeyDown("right")) {
-        game.camera.setYaw(1);
-    }
-    if (inputManager.getKeyDown("tab")) {
-        if (isWireframeModeEnabled) {
-            isWireframeModeEnabled = false;
-        } else {
-            isWireframeModeEnabled = true;
-        }
+        camera.setYaw(1);
     }
 }
 
@@ -149,7 +132,7 @@ void Engine::drawGameObjects(const std::vector<GameObject*>& gameObjects) const 
             script->run();
         }
 
-        baseShader->editShaderWithMat4("view", game.camera.getView());
+        baseShader->editShaderWithMat4("view", camera.getView());
         baseShader->editShaderWithMat4("perspective", glm::perspective(glm::radians(45.0f), 1.88791f, 0.1f, 100.0f));
         model->draw(*baseShader);
 
@@ -158,7 +141,7 @@ void Engine::drawGameObjects(const std::vector<GameObject*>& gameObjects) const 
 }
 
 void Engine::drawMeshSubClass(Mesh *mesh) {
-    baseShader->editShaderWithMat4("view", game.camera.getView());
+    baseShader->editShaderWithMat4("view", camera.getView());
     baseShader->editShaderWithMat4("perspective", glm::perspective(glm::radians(45.0f), 1.88791f, 0.1f, 100.0f));
     mesh->draw(*baseShader);
 

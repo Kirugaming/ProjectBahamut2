@@ -5,9 +5,12 @@
 #include "engineUI.h"
 #include "Script.h"
 
+Engine* engineUI::engine = nullptr;
+engineUI::EditWindow engineUI::editWindow;
+engineUI::FileExplorerWindow engineUI::fileExplorerWindow;
+std::unordered_set<std::string> engineUI::FileExplorerWindow::openFolders;
 
 engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext) {
-
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -16,13 +19,7 @@ engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext) {
     ImGui_ImplSDL2_InitForOpenGL(window, glContext);
     ImGui_ImplOpenGL3_Init();
 
-    // setup top down brush viewer
-
-
-
-
-
-    loadUiIcons();
+    initIcons();
 }
 
 engineUI::~engineUI() {
@@ -31,67 +28,14 @@ engineUI::~engineUI() {
     ImGui::DestroyContext();
 }
 
-void engineUI::renderUI(Game *game) {
-
+void engineUI::renderUI() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
-    projectFileExplorer();
+    fileExplorerWindow.draw();
+    editWindow.draw();
 
-    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 0),
-                               ImVec2(320, 300));
-
-    ImGui::Begin("Game Object Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoTitleBar);
-
-    ImGui::Text("Game Object Editor");
-    ImGui::SameLine();
-    if (ImGui::Button("Save Map")) {
-        engine->game.level->save();
-    }
-
-    ImGui::Separator();
-
-    if (ImGui::TreeNode("Map Geometry")) {
-//        for (Brush *brush : game->level->brushList) {
-//            if (brush->id == ) {
-//                if (ImGui::Button("##")) {
-//                    selectedObject = nullptr;
-//                    this->selectedBrush = brush;
-//                }
-//            } else {
-//                if (ImGui::Button(brush->name.c_str())) {
-//                    selectedObject = nullptr;
-//                    selectedBrush = brush;
-//                }
-//            }
-//        }
-        ImGui::TreePop();
-    }
-    if (ImGui::BeginPopupContextWindow()) {
-        if (ImGui::MenuItem("Add Cube Brush")) {
-            game->level->brushList.push_back(new Brush());
-        }
-        ImGui::EndPopup();
-    }
-    if (ImGui::TreeNode("Game Objects")) {
-        drawGameObjectButton(game->level->gameObjects);
-        ImGui::TreePop();
-    }
-
-
-
-
-    if (selectedObject != nullptr) {
-
-        objectEditWindow(selectedObject);
-    }
-    if (selectedBrush != nullptr) {
-
-        brushEditWindow(selectedBrush);
-    }
-
-    ImGui::End();
 
     ImGui::ShowDemoWindow();
 
@@ -100,46 +44,7 @@ void engineUI::renderUI(Game *game) {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void engineUI::objectEditWindow(GameObject *gameObject) {
-    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 300),
-                               ImVec2(320, 300));
-    ImGui::Begin("Object Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-    ImGui::Text("This is the object editor window!");
-
-    gameObject->name = drawTextInput("Object Name", gameObject->name);
-
-    drawVec3Input("Object Position", gameObject->transform.position);
-    drawVec3Input("Object Rotation", gameObject->transform.rotation);
-    drawVec3Input("Object Scale", gameObject->transform.scale);
-
-    ImGui::Separator();
-    ImGui::Text("Attached Scripts:");
-    for (int i = 0; i < gameObject->scripts.size(); ++i) {
-        ImGui::Text(gameObject->scripts[i]->path.filename().string().c_str());
-        ImGui::SameLine();
-        if (ImGui::Button("Delete")) {
-            gameObject->scripts.erase(gameObject->scripts.begin() + i);
-        }
-    }
-
-
-
-    ImGui::Button("Drop New Script Here", ImVec2(320, 50));
-    if (ImGui::BeginDragDropTarget()) {
-        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DRAG_SCRIPT_FILE")) {
-            ImGui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
-            ImGui::BeginTooltip();
-            ImGui::Text("Drop Script here to add to game object");
-            ImGui::EndTooltip();
-            gameObject->scripts.push_back(new Script(static_cast<char*>(payload->Data), gameObject)); // turn the void pointer to string :)
-        }
-        ImGui::EndDragDropTarget();
-    }
-
-    ImGui::End();
-}
-
-void engineUI::projectFileExplorer() {
+void engineUI::FileExplorerWindow::draw() {
     configureNextWindowPosSize(ImVec2(0, 0),
                                ImVec2(320, ImGui::GetIO().DisplaySize.y));
     ImGui::Begin("Project Explorer", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
@@ -155,7 +60,7 @@ void engineUI::projectFileExplorer() {
  * Recursively goes through files from project root and make button for each
  * if directory then does function again
  */
-void engineUI::displayFileTree(const std::string &path, int level) {
+void engineUI::FileExplorerWindow::displayFileTree(const std::string &path, int level) {
     std::string tabs(level, '\t');
     if (level > 0) {
         tabs += "-";
@@ -170,7 +75,7 @@ void engineUI::displayFileTree(const std::string &path, int level) {
             // find if directory is open in ui
             bool isOpen = openFolders.find(file.path().string()) != openFolders.end();
 
-            ImGui::Image((void *) (intptr_t) (isOpen ? icons["folderOpen"]->id : icons["folderClosed"]->id),
+            ImGui::Image((void *) (intptr_t) (isOpen ? ICONS->find("folderOpen")->second.id : ICONS->find("folderClosed")->second.id),
                          ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
             ImGui::SameLine();
 
@@ -192,7 +97,7 @@ void engineUI::displayFileTree(const std::string &path, int level) {
     }
 }
 
-void engineUI::handleFileTypes(const std::filesystem::directory_entry& file) {
+void engineUI::FileExplorerWindow::handleFileTypes(const std::filesystem::directory_entry& file) {
     auto fileName = file.path().filename().string();
     std::string fileType = fileName.substr(fileName.find('.') + 1, fileName.length());
 
@@ -208,17 +113,11 @@ void engineUI::handleFileTypes(const std::filesystem::directory_entry& file) {
     } else { // normal button
         if (ImGui::Button(fileName.c_str())) { // do file action
             if (fileType == "bem") {
-                selectedObject = nullptr;
-                engine->game.level = new Map(file.path().string());
+                engineUI::editWindow.clearSelected();
+                engine->map = *new Map(file.path().string());
             }
         }
     }
-}
-
-void engineUI::loadUiIcons() {
-    icons["folderClosed"] = new Texture(R"(Assets\icons\folder-solid.png)");
-    icons["folderOpen"] = new Texture(R"(Assets\icons\folder-open-regular.png)");
-    icons["object"] = new Texture(R"(Assets\icons\cube-solid.png)");
 }
 
 void engineUI::configureNextWindowPosSize(ImVec2 position, ImVec2 size) {
@@ -226,7 +125,15 @@ void engineUI::configureNextWindowPosSize(ImVec2 position, ImVec2 size) {
     ImGui::SetNextWindowSize(size, ImGuiCond_Once);
 }
 
-void engineUI::drawVec3Input(const std::string &inputName, glm::vec3 &vector3) {
+void engineUI::initIcons() {
+    ICONS = new std::map<std::string, Texture> {
+        {"folderClosed", Texture(R"(Assets\icons\folder-solid.png)")},
+        {"folderOpen", Texture(R"(Assets\icons\folder-open-regular.png)")},
+        {"object", Texture(R"(Assets\icons\cube-solid.png)")}
+    };
+}
+
+void engineUI::EditWindow::drawVec3Input(const std::string &inputName, glm::vec3 &vector3) {
     ImGui::Separator();
     ImGui::Text((inputName + ":").c_str());
     glm::vec3 vec3Buffer = vector3;
@@ -235,7 +142,7 @@ void engineUI::drawVec3Input(const std::string &inputName, glm::vec3 &vector3) {
     }
 }
 
-std::string engineUI::drawTextInput(const std::string &inputName, std::string &text) {
+std::string engineUI::EditWindow::drawTextInput(const std::string &inputName, std::string &text) {
     ImGui::Separator();
     ImGui::Text((inputName + ":").c_str());
 
@@ -249,9 +156,9 @@ std::string engineUI::drawTextInput(const std::string &inputName, std::string &t
     return text;
 }
 
-void engineUI::drawGameObjectButton(std::vector<GameObject*> &gameObjects) {
+void engineUI::EditWindow::drawGameObjectButton(std::vector<GameObject*> &gameObjects) {
     for (auto& object : gameObjects) {
-        ImGui::Image((void*)(intptr_t)icons["object"]->id, ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::Image((void*)(intptr_t)ICONS->find("object")->second.id, ImVec2(20, 20), ImVec2(0, 1), ImVec2(1, 0));
         ImGui::SameLine();
         if (object->name.empty()) {
             if (ImGui::Button("##")) {
@@ -267,41 +174,129 @@ void engineUI::drawGameObjectButton(std::vector<GameObject*> &gameObjects) {
     }
 }
 
-void engineUI::brushEditWindow(Brush *brush) {
-    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 300),
-                               ImVec2(320, 300));
-
+void engineUI::EditWindow::objectEditDraw() {
     ImGui::Begin("Object Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
     ImGui::Text("This is the object editor window!");
 
-//    brush->name = drawTextInput("Object Name", brush->name);
+    selectedObject->name = drawTextInput("Object Name", selectedObject->name);
+
+    drawVec3Input("Object Position", selectedObject->transform.position);
+    drawVec3Input("Object Rotation", selectedObject->transform.rotation);
+    drawVec3Input("Object Scale", selectedObject->transform.scale);
 
     ImGui::Separator();
-    ImGui::Checkbox("Snapping enabled for this brush", &brush->isSnapEnabled);
-
-
-    ImGui::Separator();
-    if (brush->isSnapEnabled) {
-        ImGui::Text("Object Position:");
-        if (ImGui::DragFloat3("##Object Position", glm::value_ptr(brush->transform.position), 1.0f)) {
+    ImGui::Text("Attached Scripts:");
+    for (int i = 0; i < selectedObject->scripts.size(); ++i) {
+        ImGui::Text(selectedObject->scripts[i]->path.filename().string().c_str());
+        ImGui::SameLine();
+        if (ImGui::Button("Delete")) {
+            selectedObject->scripts.erase(selectedObject->scripts.begin() + i);
         }
-    } else {
-        drawVec3Input("Object Position", brush->transform.position); // normal drag
-    }
-    drawVec3Input("Object Rotation", brush->transform.rotation);
-
-    ImGui::Separator();
-    if (brush->isSnapEnabled) {
-        ImGui::Text("Object Scale:");
-        if (ImGui::DragFloat3("##Object Scale", glm::value_ptr(brush->transform.scale), 1.0f)) {
-        }
-    } else {
-        drawVec3Input("Object Scale", brush->transform.scale); // normal drag
     }
 
-    if (brush->isSnapEnabled) {
-        brush->snapToWholeVerts();
+    ImGui::Button("Drop New Script Here", ImVec2(320, 50));
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DRAG_SCRIPT_FILE")) {
+            ImGui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
+            ImGui::BeginTooltip();
+            ImGui::Text("Drop Script here to add to game object");
+            ImGui::EndTooltip();
+            selectedObject->scripts.push_back(new Script(static_cast<char*>(payload->Data), selectedObject)); // turn the void pointer to string :)
+        }
+        ImGui::EndDragDropTarget();
     }
 
     ImGui::End();
+}
+
+void engineUI::EditWindow::brushEditDraw() {
+    ImGui::Begin("Brush Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+    ImGui::Text("This is the brush editor window!");
+
+    ImGui::Separator();
+    ImGui::Checkbox("Snapping enabled for this brush", &selectedBrush->isSnapEnabled);
+
+
+    ImGui::Separator();
+    if (selectedBrush->isSnapEnabled) {
+        ImGui::Text("Brush Position:");
+        if (ImGui::DragFloat3("##Brush Position", glm::value_ptr(selectedBrush->transform.position), 1.0f)) {
+        }
+    } else {
+        drawVec3Input("Brush Position", selectedBrush->transform.position); // normal drag
+    }
+    drawVec3Input("Brush Rotation", selectedBrush->transform.rotation);
+
+    ImGui::Separator();
+    if (selectedBrush->isSnapEnabled) {
+        ImGui::Text("Brush Scale:");
+        if (ImGui::DragFloat3("##Brush Scale", glm::value_ptr(selectedBrush->transform.scale), 1.0f)) {
+        }
+    } else {
+        drawVec3Input("Brush Scale", selectedBrush->transform.scale); // normal drag
+    }
+
+    if (selectedBrush->isSnapEnabled) {
+        selectedBrush->snapToWholeVerts();
+    }
+
+    ImGui::End();
+}
+
+void engineUI::EditWindow::setSelected(GameObject *gameObject) {
+    if (selectedBrush != nullptr) {
+        selectedBrush = nullptr;
+    }
+    this->selectedObject = gameObject;
+}
+
+void engineUI::EditWindow::setSelected(Brush *brush) {
+    if (selectedObject != nullptr) {
+        selectedObject = nullptr;
+    }
+    this->selectedBrush = brush;
+}
+
+void engineUI::EditWindow::draw() {
+    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 0),
+                               ImVec2(320, 300));
+    ImGui::Begin("Game Object Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoTitleBar);
+
+    ImGui::Text("Game Object Editor");
+    ImGui::SameLine();
+    if (ImGui::Button("Save Map")) {
+        engine->map.save();
+    }
+
+    ImGui::Separator();
+
+    if (ImGui::TreeNode("Map Geometry")) {
+
+        ImGui::TreePop();
+    }
+    if (ImGui::BeginPopupContextWindow()) {
+        if (ImGui::MenuItem("Add Cube Brush")) {
+            engine->map.brushList.push_back(new Brush());
+        }
+        ImGui::EndPopup();
+    }
+    if (ImGui::TreeNode("Game Objects")) {
+        drawGameObjectButton(engine->map.gameObjects);
+        ImGui::TreePop();
+    }
+
+    ImGui::End();
+
+    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 300),
+                               ImVec2(320, 300));
+    if (selectedObject != nullptr) {
+        objectEditDraw();
+    } else if (selectedBrush != nullptr) {
+        brushEditDraw();
+    }
+}
+
+void engineUI::EditWindow::clearSelected() {
+    selectedObject = nullptr;
+    selectedBrush = nullptr;
 }

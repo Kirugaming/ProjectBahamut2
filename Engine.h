@@ -15,7 +15,6 @@
 #include "imgui.h"
 #include "Map.h"
 #include "engineUI.h"
-#include "Game.h"
 #include "Projects.h"
 #include "InputManager.h"
 #include "Brush.h"
@@ -27,34 +26,48 @@ static struct WindowSize {
     int width;
 } windowSize;
 
+struct DeltaTime {
+    void update() {
+        currentFrame = (float) SDL_GetPerformanceCounter();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+    }
+
+    [[nodiscard]] float get() const {
+        return deltaTime;
+    }
+
+private:
+    float lastFrame = 0.0f;
+    float currentFrame = 0.0f;
+    float deltaTime = 0.0f;
+};
+
 class Engine {
 public:
-    SDL_DisplayMode displayMode;
     SDL_Window *window = nullptr;
     SDL_GLContext glContext = nullptr;
-    SDL_Event event;
-
-
     WindowSize windowSize;
     Project project;
-    Game game;
-    bool isWireframeModeEnabled = false;
+    Map map;
 
-    InputManager &inputManager = InputManager::getInstance();
-    engineUI *ui;
-
-
-    // Dear Imgui to be implemented
     Engine(Project &chosenProject);
     ~Engine();
 
+    [[noreturn]] void engineLoop();
 
-    void engineLoop();
-
-
-
+    engineUI *ui;
 private:
-    Shader *baseShader; // make this so its made after opengl context is created
+    SDL_DisplayMode displayMode;
+    SDL_Event event;
+    InputManager &inputManager = InputManager::getInstance();
+    bool quit = false;
+    DeltaTime deltaTime;
+    Shader *baseShader;
+    Camera camera = Camera(glm::vec3(0.0f, 0.0f, 2.0f));
+
+
+
 
     int initRendering(int winHeight, int winWidth); // SDL and OpenGL
     void eventMonitor();

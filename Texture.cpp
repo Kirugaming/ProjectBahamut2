@@ -7,7 +7,7 @@
 #include "glad/glad.h"
 #include "stb_image.h"
 
-Texture::Texture(const std::string& filePath) {
+Texture::Texture(const char* filePath) {
     path = filePath;
 
     unsigned int textureID;
@@ -16,7 +16,7 @@ Texture::Texture(const std::string& filePath) {
     stbi_set_flip_vertically_on_load(true);
 
     int width, height, nrComponents;
-    unsigned char *data = stbi_load(filePath.c_str(), &width, &height, &nrComponents, 0);
+    unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
     if (data)
     {
         GLenum format;

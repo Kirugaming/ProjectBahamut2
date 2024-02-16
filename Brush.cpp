@@ -48,10 +48,12 @@ void Brush::snapToWholeVerts() {
 std::stringstream Brush::writeToString() {
     std::stringstream brushData;
 
-    brushData << "brush " << this->id << "\n";
+    brushData << "brush\n";
 
     for (auto &vertex : vertices) {
-        brushData << "vertex " << vertex.position.x << " " << vertex.position.y << " " << vertex.position.z << " " << vertex.normals.x << " " << vertex.normals.y << " " << vertex.normals.z << " " << vertex.texCoords.x << " " << vertex.texCoords.y << "\n";
+        brushData << "vertex " << vertex.position.x << " " << vertex.position.y << " " << vertex.position.z << " "
+                            << vertex.normals.x << " " << vertex.normals.y << " " << vertex.normals.z << " "
+                            << vertex.texCoords.x << " " << vertex.texCoords.y << "\n";
     }
 
     brushData << "indices ";

@@ -115,7 +115,7 @@ std::vector<MeshTexture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureT
         aiString str;
         mat->GetTexture(type, i, &str);
         MeshTexture meshTexture;
-        meshTexture.texture = new Texture(directory + "/" + str.C_Str());
+        meshTexture.texture = new Texture((directory + "/" + str.C_Str()).c_str());
         meshTexture.type = typeName;
 
         textures.push_back(meshTexture);

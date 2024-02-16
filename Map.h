@@ -6,7 +6,6 @@
 #define PROJECTBAHAMUT_MAP_H
 
 #include <string>
-#include <yaml-cpp/yaml.h>
 #include "GameObject.h"
 #include "Brush.h"
 

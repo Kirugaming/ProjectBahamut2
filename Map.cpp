@@ -37,12 +37,12 @@ Map::Map(const std::string& mapFilePath) {
 void Map::save() const {
     std::ofstream file(path);
     file << "# -Battle Engine Map-\n"
-            "# brush = brush start and index in maps brush list (order they're add)\n"
+            "# brush = brush start\n"
             "# vertex = position(x, y, z), normals(x, y, z), texCoords(x, y)\n"
             "# indices = vertex index, , , , vertex index\n"
             "# transform = position(x, y, z), rotation(x, y, z), scale(x, y, z)\n"
             "# end = end of serialization\n"
-            "v0.2.5\n";
+            "v0.2.5\n"; // .bem version for compatibility checks in the future
 
     for (auto i : brushList) {
         file << i->writeToString().rdbuf();
