@@ -21,6 +21,19 @@ class Engine;
 static const std::map<std::string, Texture> *ICONS = nullptr;
 
 class engineUI {
+
+    struct RenderWindow {
+        void draw();
+        void initTexture();
+    private:
+        unsigned int FBO{};
+        unsigned int renderTextureId{};
+        int winWidth = 1280;
+        int winHeight = 740;
+
+        void handleResizing();
+    };
+
     struct EditWindow {
         void draw();
         void setSelected(GameObject *gameObject);
@@ -47,7 +60,7 @@ class engineUI {
         void handleFileTypes(const std::filesystem::directory_entry& file);
     };
 
-
+    static RenderWindow renderWindow;
     static EditWindow editWindow;
     static FileExplorerWindow fileExplorerWindow;
 

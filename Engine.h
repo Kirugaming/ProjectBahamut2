@@ -55,6 +55,7 @@ public:
     ~Engine();
 
     [[noreturn]] void engineLoop();
+    void draw();
 
     engineUI *ui;
 private:

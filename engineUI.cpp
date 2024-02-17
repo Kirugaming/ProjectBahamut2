@@ -6,6 +6,7 @@
 #include "Script.h"
 
 Engine* engineUI::engine = nullptr;
+engineUI::RenderWindow engineUI::renderWindow;
 engineUI::EditWindow engineUI::editWindow;
 engineUI::FileExplorerWindow engineUI::fileExplorerWindow;
 std::unordered_set<std::string> engineUI::FileExplorerWindow::openFolders;
@@ -20,6 +21,7 @@ engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext) {
     ImGui_ImplOpenGL3_Init();
 
     initIcons();
+    renderWindow.initTexture();
 }
 
 engineUI::~engineUI() {
@@ -33,6 +35,7 @@ void engineUI::renderUI() {
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
+    renderWindow.draw();
     fileExplorerWindow.draw();
     editWindow.draw();
 
@@ -299,4 +302,53 @@ void engineUI::EditWindow::draw() {
 void engineUI::EditWindow::clearSelected() {
     selectedObject = nullptr;
     selectedBrush = nullptr;
+}
+
+
+void engineUI::RenderWindow::draw() {
+    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x / 6, 0),
+                               ImVec2(winWidth, winHeight));
+
+
+    ImGui::Begin("Render Window", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav);
+    handleResizing();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    engine->draw();
+    ImGui::Image((void*)(intptr_t) renderTextureId, ImVec2(winWidth, winHeight));
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    ImGui::End();
+}
+
+void engineUI::RenderWindow::initTexture() {
+    glGenFramebuffers(1, &FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+
+    // create the texture that the renderer will draw on and attach it to FBO and make sure the FBO is complete
+    glGenTextures(1, &renderTextureId);
+    glBindTexture(GL_TEXTURE_2D, renderTextureId);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, winWidth, winHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTextureId, 0);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cerr << "FRAMEBUFFER IS MISSING ATTACHMENTS" << std::endl;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void engineUI::RenderWindow::handleResizing() {
+    ImVec2 currentSize = ImGui::GetContentRegionAvail();
+
+    if (currentSize.x != winWidth || currentSize.y != winHeight) {
+        winWidth = floor(currentSize.x);
+        winHeight = floor(currentSize.y);
+
+        glViewport(0, 0, winWidth, winHeight);
+
+        initTexture();
+    }
 }

@@ -54,23 +54,26 @@ void Engine::engineLoop() {
         eventMonitor(); // query SDL events
         KeyboardInput();
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        glClearColor(.2f, .3f, .3f, 1.0f);
-
-        baseShader->use();
-
-        for (Brush *brush: map.brushList) {
-            drawMeshSubClass(brush);
-        }
-        drawGameObjects(map.gameObjects);
-
-        baseShader->unUse();
-
         ui->renderUI();
 
         SDL_GL_SwapWindow(window);
     }
 }
+
+void Engine::draw() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClearColor(.2f, .3f, .3f, 1.0f);
+
+    baseShader->use();
+
+    for (Brush *brush: map.brushList) {
+        drawMeshSubClass(brush);
+    }
+    drawGameObjects(map.gameObjects);
+
+    baseShader->unUse();
+}
+
 
 
 void Engine::eventMonitor() {
