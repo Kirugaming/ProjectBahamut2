@@ -6,10 +6,10 @@
 #define PROJECTBAHAMUT_BRUSH_H
 
 #include <vector>
-#include "Transformation.h"
 #include "Shader.h"
 #include "Mesh.h"
 #include "yaml-cpp/node/node.h"
+#include "Types.h"
 
 enum BrushShapes {
     CUBE = 0,

@@ -18,7 +18,7 @@ glm::mat4 Camera::getView() const {
 }
 
 void Camera::movement(Camera::Input moveDirection, float deltaTime) {
-    float velocity = .1f * deltaTime;
+    float velocity = .0000001f * deltaTime;
     switch (moveDirection) {
         case FORWARD:
             position += direction * velocity;
@@ -49,7 +49,7 @@ void Camera::mouseLook(float mouseX, float mouseY) {
 }
 
 void Camera::setPitch(float offset) {
-    pitch += offset;
+    pitch -= offset;
 
     if (pitch > 89.0f)
         pitch = 89.0f;

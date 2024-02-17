@@ -1,8 +1,9 @@
 //
-// Created by kirut on 10/9/2023.
+// Created by kirut on 2/16/2024.
 //
+#include "Types.h"
+#include "glm/ext/matrix_transform.hpp"
 
-#include "Transformation.h"
 
 glm::mat4 Transform::toMat4() const {
     glm::mat4 translationMat = glm::translate(glm::mat4(1.0f), position);
@@ -16,3 +17,4 @@ glm::mat4 Transform::toMat4() const {
 
     return translationMat * rotationMat * scaleMat;
 }
+

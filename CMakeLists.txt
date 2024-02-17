@@ -19,7 +19,7 @@ set(IMGUI_SOURCES lib/imgui/imgui.cpp
 include_directories(lib/imgui)
 
 # Must set the path to the main.cpp, for example: scripts/main.cpp if it is inside a folder
-set(SOURCE_FILES main.cpp main.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp Model.h Transformation.cpp Transformation.h GameObject.cpp GameObject.h Camera.cpp Camera.h Engine.h Engine.cpp Map.cpp Map.h engineUI.cpp engineUI.h Projects.cpp Projects.h
+set(SOURCE_FILES main.cpp main.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp Model.h Transformation.h GameObject.cpp GameObject.h Camera.cpp Camera.h Engine.h Engine.cpp Map.cpp Map.h engineUI.cpp engineUI.h Projects.cpp Projects.h
         Texture.cpp
         Texture.h
         Script.cpp
@@ -28,6 +28,8 @@ set(SOURCE_FILES main.cpp main.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp M
         InputManager.h
         Brush.cpp
         Brush.h
+        Types.h
+        Types.cpp
 )
 set(LIB_FILES glad.c)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${LIB_FILES} ${IMGUI_SOURCES})

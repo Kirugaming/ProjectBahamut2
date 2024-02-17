@@ -48,8 +48,8 @@ void engineUI::renderUI() {
 }
 
 void engineUI::FileExplorerWindow::draw() {
-    configureNextWindowPosSize(ImVec2(0, 0),
-                               ImVec2(320, ImGui::GetIO().DisplaySize.y));
+    configureNextWindowPosSize(vec2(0, 0),
+                               vec2(320, ImGui::GetIO().DisplaySize.y));
     ImGui::Begin("Project Explorer", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
     ImGui::Text("Project Explorer");
     ImGui::Separator();
@@ -123,9 +123,9 @@ void engineUI::FileExplorerWindow::handleFileTypes(const std::filesystem::direct
     }
 }
 
-void engineUI::configureNextWindowPosSize(ImVec2 position, ImVec2 size) {
-    ImGui::SetNextWindowPos(position, ImGuiCond_Once);
-    ImGui::SetNextWindowSize(size, ImGuiCond_Once);
+void engineUI::configureNextWindowPosSize(vec2 position, vec2 size) {
+    ImGui::SetNextWindowPos((ImVec2) position, ImGuiCond_Once);
+    ImGui::SetNextWindowSize((ImVec2) size, ImGuiCond_Once);
 }
 
 void engineUI::initIcons() {
@@ -261,8 +261,8 @@ void engineUI::EditWindow::setSelected(Brush *brush) {
 }
 
 void engineUI::EditWindow::draw() {
-    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 0),
-                               ImVec2(320, 300));
+    configureNextWindowPosSize(vec2(ImGui::GetIO().DisplaySize.x - 320, 0),
+                               vec2(320, 300));
     ImGui::Begin("Game Object Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoTitleBar);
 
     ImGui::Text("Game Object Editor");
@@ -290,8 +290,8 @@ void engineUI::EditWindow::draw() {
 
     ImGui::End();
 
-    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x - 320, 300),
-                               ImVec2(320, 300));
+    configureNextWindowPosSize(vec2(ImGui::GetIO().DisplaySize.x - 320, 300),
+                               vec2(320, 300));
     if (selectedObject != nullptr) {
         objectEditDraw();
     } else if (selectedBrush != nullptr) {
@@ -306,9 +306,8 @@ void engineUI::EditWindow::clearSelected() {
 
 
 void engineUI::RenderWindow::draw() {
-    configureNextWindowPosSize(ImVec2(ImGui::GetIO().DisplaySize.x / 6, 0),
-                               ImVec2(winWidth, winHeight));
-
+    configureNextWindowPosSize(vec2(ImGui::GetIO().DisplaySize.x / 6, 0),
+                               vec2(winWidth, winHeight));
 
     ImGui::Begin("Render Window", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav);
     handleResizing();

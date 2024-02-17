@@ -8,7 +8,6 @@
 
 #include <string>
 #include "Model.h"
-#include "Transformation.h"
 #include "Camera.h"
 #include "Script.h"
 

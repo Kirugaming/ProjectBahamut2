@@ -9,7 +9,7 @@
 #include <vector>
 #include "Shader.h"
 #include "Mesh.h"
-#include "Transformation.h"
+#include "Types.h"
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>

@@ -11,6 +11,7 @@
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl2.h"
 #include "Engine.h"
+#include "Types.h"
 #include <filesystem>
 #include <unordered_set>
 #include <map>
@@ -64,7 +65,7 @@ class engineUI {
     static EditWindow editWindow;
     static FileExplorerWindow fileExplorerWindow;
 
-    static void configureNextWindowPosSize(ImVec2 position, ImVec2 size);
+    static void configureNextWindowPosSize(vec2 position, vec2 size);
     static void initIcons();
 
 public:
