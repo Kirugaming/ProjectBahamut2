@@ -56,6 +56,7 @@ public:
 
     [[noreturn]] void engineLoop();
     void draw();
+    void clickOnBrush(vec2 mouseCoords);
 
     engineUI *ui;
 private:
@@ -73,7 +74,7 @@ private:
     int initRendering(int winHeight, int winWidth); // SDL and OpenGL
     void eventMonitor();
     void KeyboardInput();
-    void drawMeshSubClass(Mesh *mesh);
+    void drawBrush(Brush *brush);
     void drawGameObjects(const std::vector<GameObject*>& gameObjects) const;
 };
 

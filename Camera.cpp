@@ -3,6 +3,7 @@
 //
 #include <iostream>
 #include "Camera.h"
+#include "glm/ext/matrix_clip_space.hpp"
 
 Camera::Camera(glm::vec3 inPosition, glm::vec3 up) : direction(glm::vec3(0.0f, 0.0f, -1.0f)) {
     position = inPosition;

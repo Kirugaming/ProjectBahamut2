@@ -5,16 +5,13 @@
 #include "engineUI.h"
 #include "Script.h"
 
-Engine* engineUI::engine = nullptr;
-engineUI::RenderWindow engineUI::renderWindow;
-engineUI::EditWindow engineUI::editWindow;
-engineUI::FileExplorerWindow engineUI::fileExplorerWindow;
 std::unordered_set<std::string> engineUI::FileExplorerWindow::openFolders;
 
 engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
+
+    io = ImGui::GetIO();
 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, glContext);
@@ -35,6 +32,8 @@ void engineUI::renderUI() {
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
+    io = ImGui::GetIO();
+
     renderWindow.draw();
     fileExplorerWindow.draw();
     editWindow.draw();
@@ -48,13 +47,13 @@ void engineUI::renderUI() {
 }
 
 void engineUI::FileExplorerWindow::draw() {
-    configureNextWindowPosSize(vec2(0, 0),
+    ui.configureNextWindowPosSize(vec2(0, 0),
                                vec2(320, ImGui::GetIO().DisplaySize.y));
     ImGui::Begin("Project Explorer", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
     ImGui::Text("Project Explorer");
     ImGui::Separator();
 
-    displayFileTree(engine->project.path, 0);
+    displayFileTree(ui.engine->project.path, 0);
 
 
     ImGui::End();
@@ -116,8 +115,8 @@ void engineUI::FileExplorerWindow::handleFileTypes(const std::filesystem::direct
     } else { // normal button
         if (ImGui::Button(fileName.c_str())) { // do file action
             if (fileType == "bem") {
-                engineUI::editWindow.clearSelected();
-                engine->map = *new Map(file.path().string());
+                ui.editWindow.clearSelected();
+                ui.engine->map = *new Map(file.path().string());
             }
         }
     }
@@ -261,14 +260,14 @@ void engineUI::EditWindow::setSelected(Brush *brush) {
 }
 
 void engineUI::EditWindow::draw() {
-    configureNextWindowPosSize(vec2(ImGui::GetIO().DisplaySize.x - 320, 0),
+    ui.configureNextWindowPosSize(vec2(ImGui::GetIO().DisplaySize.x - 320, 0),
                                vec2(320, 300));
     ImGui::Begin("Game Object Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoTitleBar);
 
     ImGui::Text("Game Object Editor");
     ImGui::SameLine();
     if (ImGui::Button("Save Map")) {
-        engine->map.save();
+        ui.engine->map.save();
     }
 
     ImGui::Separator();
@@ -279,18 +278,18 @@ void engineUI::EditWindow::draw() {
     }
     if (ImGui::BeginPopupContextWindow()) {
         if (ImGui::MenuItem("Add Cube Brush")) {
-            engine->map.brushList.push_back(new Brush());
+            ui.engine->map.brushList.push_back(new Brush());
         }
         ImGui::EndPopup();
     }
     if (ImGui::TreeNode("Game Objects")) {
-        drawGameObjectButton(engine->map.gameObjects);
+        drawGameObjectButton(ui.engine->map.gameObjects);
         ImGui::TreePop();
     }
 
     ImGui::End();
 
-    configureNextWindowPosSize(vec2(ImGui::GetIO().DisplaySize.x - 320, 300),
+    ui.configureNextWindowPosSize(vec2(ImGui::GetIO().DisplaySize.x - 320, 300),
                                vec2(320, 300));
     if (selectedObject != nullptr) {
         objectEditDraw();
@@ -306,16 +305,29 @@ void engineUI::EditWindow::clearSelected() {
 
 
 void engineUI::RenderWindow::draw() {
-    configureNextWindowPosSize(vec2(ImGui::GetIO().DisplaySize.x / 6, 0),
+    ui.configureNextWindowPosSize(vec2(ImGui::GetIO().DisplaySize.x / 6, 0),
                                vec2(winWidth, winHeight));
 
     ImGui::Begin("Render Window", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav);
     handleResizing();
+    mouseRelativeToRender();
 
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-    engine->draw();
+    ui.engine->draw();
     ImGui::Image((void*)(intptr_t) renderTextureId, ImVec2(winWidth, winHeight));
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    if (ImGui::IsWindowHovered(ImGuiHoveredFlags_None) && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+        // convert to world space
+        mousePos.x = (2.0f * mousePos.x) / winWidth - 1.0f;
+        mousePos.y = 1.0f - (2.0f * mousePos.y) / winHeight;
+        ui.engine->clickOnBrush(mousePos);
+    }
+
+    ImGui::Begin("Rendering debug");
+    ImGui::Text(("Mouse Position: " + std::to_string(mousePos.x) + " " + std::to_string(mousePos.y) ).c_str());
+
+    ImGui::End();
 
     ImGui::End();
 }
@@ -350,4 +362,17 @@ void engineUI::RenderWindow::handleResizing() {
 
         initTexture();
     }
+}
+
+void engineUI::RenderWindow::mouseRelativeToRender() {
+//    mousePos.x = 2 * (((ui.io.MousePos.x - (ui.io.DisplaySize.x / 6) - 8) - winWidth / 2) / (winWidth));
+//    mousePos.y = -1 * ((ui.io.MousePos.y - 26) - winHeight) / (winHeight);
+//    mousePos.x = ((ui.io.MousePos.x - (ui.io.DisplaySize.x / 6) - 8) - winWidth / 2);
+//    mousePos.y = -1 * ((ui.io.MousePos.y - 26) - (winHeight/2));
+    mousePos.x = ((ui.io.MousePos.x - ImGui::GetIO().DisplaySize.x / 6 - 8));
+    mousePos.y = -1 * ((ui.io.MousePos.y - 26) - (winHeight));
+}
+
+float engineUI::RenderWindow::getAspectRatio() const {
+    return winWidth / winHeight;
 }

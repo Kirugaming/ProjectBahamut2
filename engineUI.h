@@ -22,25 +22,33 @@ class Engine;
 static const std::map<std::string, Texture> *ICONS = nullptr;
 
 class engineUI {
-
     struct RenderWindow {
+        explicit RenderWindow(engineUI &parent) : ui(parent) {};
+
         void draw();
         void initTexture();
+        [[nodiscard]] float getAspectRatio() const;
     private:
+        engineUI &ui;
         unsigned int FBO{};
         unsigned int renderTextureId{};
         int winWidth = 1280;
         int winHeight = 740;
+        vec2 mousePos = {0, 0};
 
         void handleResizing();
+        void mouseRelativeToRender();
     };
 
     struct EditWindow {
+        explicit EditWindow(engineUI &parent) : ui(parent) {};
+
         void draw();
         void setSelected(GameObject *gameObject);
         void setSelected(Brush *brush);
         void clearSelected();
     private:
+        engineUI &ui;
         GameObject *selectedObject = nullptr;
         Brush *selectedBrush = nullptr;
 
@@ -52,29 +60,32 @@ class engineUI {
     };
 
     struct FileExplorerWindow {
+        explicit FileExplorerWindow(engineUI &parent) : ui(parent) {};
+
         void draw();
     private:
+        engineUI &ui;
         static std::unordered_set<std::string> openFolders;
-        std::string *fileDragTemp;
+        std::string *fileDragTemp = nullptr;
 
         void displayFileTree(const std::string &path, int level);
         void handleFileTypes(const std::filesystem::directory_entry& file);
     };
+    ImGuiIO io;
 
-    static RenderWindow renderWindow;
-    static EditWindow editWindow;
-    static FileExplorerWindow fileExplorerWindow;
-
-    static void configureNextWindowPosSize(vec2 position, vec2 size);
-    static void initIcons();
+    void configureNextWindowPosSize(vec2 position, vec2 size);
+    void initIcons();
 
 public:
-    static Engine *engine;
+    Engine *engine;
+    RenderWindow renderWindow = RenderWindow(*this);
+    EditWindow editWindow = EditWindow(*this);
+    FileExplorerWindow fileExplorerWindow = FileExplorerWindow(*this);
 
     engineUI(SDL_Window *window, SDL_GLContext &glContext);
     ~engineUI();
 
-    static void renderUI();
+    void renderUI();
 };
 
 #endif //PROJECTBAHAMUT_ENGINEUI_H

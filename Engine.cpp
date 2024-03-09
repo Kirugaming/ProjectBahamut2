@@ -67,7 +67,7 @@ void Engine::draw() {
     baseShader->use();
 
     for (Brush *brush: map.brushList) {
-        drawMeshSubClass(brush);
+        drawBrush(brush);
     }
     drawGameObjects(map.gameObjects);
 
@@ -143,9 +143,22 @@ void Engine::drawGameObjects(const std::vector<GameObject*>& gameObjects) const 
     }
 }
 
-void Engine::drawMeshSubClass(Mesh *mesh) {
+void Engine::drawBrush(Brush *brush) {
     baseShader->editShaderWithMat4("view", camera.getView());
-    baseShader->editShaderWithMat4("perspective", glm::perspective(glm::radians(45.0f), 1.88791f, 0.1f, 100.0f));
-    mesh->draw(*baseShader);
+    baseShader->editShaderWithMat4("perspective", glm::perspective(camera.fov, ui->renderWindow.getAspectRatio(), 0.1f, 100.0f));
+    brush->draw(*baseShader);
+
+}
+
+void Engine::clickOnBrush(vec2 mouseCoords) {
+    glm::vec4 rayClip(mouseCoords.x, mouseCoords.y, -1.0f, 1.0f);
+    glm::vec4 rayEye = glm::inverse(glm::perspective(camera.fov, ui->renderWindow.getAspectRatio(), 0.1f, 100.0f)) * rayClip;
+    rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
+    glm::vec3 rayWorld = glm::inverse(camera.getView()) * rayEye;
+    rayWorld = glm::normalize(rayWorld);
+
+    for (int i = 0; i < map.brushList.size(); ++i) {
+//        map.brushList[i]->intersect(rayWorld);
+    }
 
 }

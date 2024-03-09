@@ -25,14 +25,14 @@ public:
     glm::vec3 up;
     glm::vec3 worldUp;
     glm::vec3 right;
-
     float yaw;
     float pitch;
-
+    float fov = glm::radians(45.0f);
 
     Camera(glm::vec3 inPosition = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f));
 
-    glm::mat4 getView() const;
+    [[nodiscard]] glm::mat4 getView() const;
+
     void movement(Input direction, float deltaTime);
     void mouseLook(float mouseX, float mouseY);
 

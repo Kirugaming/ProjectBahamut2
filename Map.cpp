@@ -111,7 +111,8 @@ Brush *Map::addBrush(std::ifstream &mapFile, std::string &fileLine) {
         }
     }
 
-    return new Brush(newVertices, newIndices, newTransform);
+//    return new Brush(newVertices, newIndices, newTransform); TODO
+    return new Brush();
 }
 
 //GameObject* Map::addGameObject(const YAML::Node &object) {

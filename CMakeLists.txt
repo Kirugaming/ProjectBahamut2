@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.22)
 project(ProjectBahamut)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++ -static-libgcc")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 #add_compile_options(-Wno-error=dangling-reference) # assimp (compile bug?)
@@ -19,7 +21,7 @@ set(IMGUI_SOURCES lib/imgui/imgui.cpp
 include_directories(lib/imgui)
 
 # Must set the path to the main.cpp, for example: scripts/main.cpp if it is inside a folder
-set(SOURCE_FILES main.cpp main.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp Model.h Transformation.h GameObject.cpp GameObject.h Camera.cpp Camera.h Engine.h Engine.cpp Map.cpp Map.h engineUI.cpp engineUI.h Projects.cpp Projects.h
+set(SOURCE_FILES main.cpp main.h Shader.cpp Shader.h Mesh.cpp Mesh.h Model.cpp Model.h GameObject.cpp GameObject.h Camera.cpp Camera.h Engine.h Engine.cpp Map.cpp Map.h engineUI.cpp engineUI.h Projects.cpp Projects.h
         Texture.cpp
         Texture.h
         Script.cpp
