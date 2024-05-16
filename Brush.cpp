@@ -47,31 +47,12 @@ void Brush::draw(Shader &shader) {
     glBindVertexArray(0);
 }
 
-//Brush::Brush(int id, Transform transform1) : id(id), Mesh(cube.vertices, cube.indices, {}, {glm::vec3(1.0f, 1.0f, 1.0f)}) {
-//    transform = *new Transform(transform1);
-//}
-
-//void Brush::applyTransformVertices() {
-//    glm::mat4 model = transform.toMat4();
-//
-//    for (int i = 0; i < vertices.size(); ++i) {
-//        vertices[i].position = glm::vec3(model * glm::vec4(cube.vertices[i].position, 1.0f));
-//    }
-//
-//    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-//
-//    glNamedBufferSubData(VBO, 0, static_cast<GLsizeiptr>(vertices.size() * sizeof(Vertex)), vertices.data());
-//
-//    glBindBuffer(GL_ARRAY_BUFFER, 0);
-//}
-
 void Brush::snapToWholeVerts() {
     if (isSnapEnabled) {
         transform.position = glm::floor(transform.position);
         transform.scale = glm::floor(transform.scale);
     }
 }
-
 
 std::stringstream Brush::writeToString() {
     std::stringstream brushData;
@@ -99,56 +80,66 @@ std::stringstream Brush::writeToString() {
     return brushData;
 }
 
-bool Brush::checkRayIntersection(glm::vec3 rayCoords) {
+bool Brush::checkRayIntersection(glm::vec3 rayCoords, glm::vec3 rayOrigin) {
 
     return false;
 }
 
 void Brush::create(int numSides) {
     // num has to be greater than 2
-    // TODO: DISTANCE, NORMALS
-    plane firstPlane;
-    firstPlane.vertices.emplace_back(-0.5f, -0.5f, -0.5f);
-    firstPlane.vertices.emplace_back(0.5f, -0.5f, -0.5f);
-    firstPlane.vertices.emplace_back(0.5f,  0.5f, -0.5f);
-    firstPlane.vertices.emplace_back(-0.5f, -0.5f, -0.5f);
-    firstPlane.vertices.emplace_back(-0.5f, 0.5f, -0.5f);
-    firstPlane.vertices.emplace_back(0.5f, 0.5f, -0.5f);
-    planes.push_back(firstPlane);
-
     // create rest of sides from angle from num of sides
     if (numSides >= 3) {
         float angle = glm::radians(360.0f / numSides);
-        for (int i = 1; i < numSides; ++i) {
-            plane p;
-            plane lastPlane = planes.back();
-            glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
-            p.vertices.emplace_back(rotMat * glm::vec4(lastPlane.vertices[0], 1.0f));
-            p.vertices.emplace_back(rotMat * glm::vec4(lastPlane.vertices[1], 1.0f));
-            p.vertices.emplace_back(rotMat * glm::vec4(lastPlane.vertices[2], 1.0f));
-            p.vertices.emplace_back(rotMat * glm::vec4(lastPlane.vertices[3], 1.0f));
-            p.vertices.emplace_back(rotMat * glm::vec4(lastPlane.vertices[4], 1.0f));
-            p.vertices.emplace_back(rotMat * glm::vec4(lastPlane.vertices[5], 1.0f));
-            planes.push_back(p);
+        Plane top;
+        Plane bottom;
+        glm::mat4 unAngle = glm::rotate(glm::mat4(1.0f), glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        for (int i = 0; i < numSides; ++i) {
+            Plane side;
+            float angle1 = i * angle;
+            float angle2 = (i + 1) * angle;
+
+            // top slice
+            top.vertices.emplace_back(0.0f, 1.0f / 2.0f, 0.0f); // middle
+            top.vertices.emplace_back(std::sin(angle1)/2, 1.0f / 2.0f, std::cos(angle1)/2); // left
+            top.vertices.emplace_back(std::sin(angle2)/2, 1.0f / 2.0f, std::cos(angle2)/2); // right
+            // side
+            // left tri
+            side.vertices.emplace_back(std::sin(angle1)/2, 1.0f / 2.0f, std::cos(angle1)/2);
+            side.vertices.emplace_back(std::sin(angle2)/2, 1.0f / 2.0f, std::cos(angle2)/2);
+            side.vertices.emplace_back(std::sin(angle1)/2, -1.0f / 2.0f, std::cos(angle1)/2);
+            // right tri
+            side.vertices.emplace_back(std::sin(angle1)/2, -1.0f / 2.0f, std::cos(angle1)/2);
+            side.vertices.emplace_back(std::sin(angle2)/2, -1.0f / 2.0f, std::cos(angle2)/2);
+            side.vertices.emplace_back(std::sin(angle2)/2, 1.0f / 2.0f, std::cos(angle2)/2);
+            // bottom slice
+            bottom.vertices.emplace_back(0.0f, -1.0f / 2.0f, 0.0f);
+            bottom.vertices.emplace_back(std::sin(angle1)/2, -1.0f / 2.0f, std::cos(angle1)/2);
+            bottom.vertices.emplace_back(std::sin(angle2)/2, -1.0f / 2.0f, std::cos(angle2)/2);
+
+            // the shape is angled so rotate it 45 degrees mainly so the face of a cube is facing the camera when created
+            for (auto & vertex : side.vertices) {
+                vertex = unAngle * glm::vec4(vertex, 1.0f);
+            }
+            planes.push_back(side);
+        }
+        for (auto & vertex : top.vertices) {
+            vertex = unAngle * glm::vec4(vertex, 1.0f);
+        }
+        for (auto & vertex : bottom.vertices) {
+            vertex = unAngle * glm::vec4(vertex, 1.0f);
+        }
+        planes.push_back(top);
+        planes.push_back(bottom);
+
+        // get normal and distance for each plane
+        for (plane& p : planes) {
+           glm::vec3 AB = p.vertices[1] - p.vertices[0];
+           glm::vec3 AC = p.vertices[2] - p.vertices[0];
+           p.normal = glm::normalize(glm::cross(AB, AC));
+
+           p.distance = glm::dot(p.normal, p.vertices[0]);
         }
     }
-    plane bottomPlane;
-    plane topPlane;
-    // complete top and bottom
-    for (auto & plane : planes) {
-
-
-        bottomPlane.vertices.emplace_back(plane.vertices[0]);
-        bottomPlane.vertices.emplace_back(0.0f, -0.5f, 0.0f); // you could get the y position for the bottom verts but i hard coded
-        bottomPlane.vertices.emplace_back(plane.vertices[1]);
-
-        topPlane.vertices.emplace_back(plane.vertices[4]);
-        topPlane.vertices.emplace_back(0.0f, 0.5f, 0.0f);
-        topPlane.vertices.emplace_back(plane.vertices[5]);
-
-
-    }
-    planes.push_back(bottomPlane);
-    planes.push_back(topPlane);
 }
+
 

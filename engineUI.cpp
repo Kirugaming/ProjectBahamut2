@@ -318,10 +318,13 @@ void engineUI::RenderWindow::draw() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     if (ImGui::IsWindowHovered(ImGuiHoveredFlags_None) && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-        // convert to world space
-        mousePos.x = (2.0f * mousePos.x) / winWidth - 1.0f;
-        mousePos.y = 1.0f - (2.0f * mousePos.y) / winHeight;
-        ui.engine->clickOnBrush(mousePos);
+        // normalize
+        glm::vec3 mouseNorm = {
+                (2.0f * mousePos.x) / winWidth - 1.0f,
+                1.0f - (2.0f * mousePos.y) / winHeight,
+                1.0f
+        };
+        ui.engine->clickOnBrush(mouseNorm);
     }
 
     ImGui::Begin("Rendering debug");
@@ -365,10 +368,6 @@ void engineUI::RenderWindow::handleResizing() {
 }
 
 void engineUI::RenderWindow::mouseRelativeToRender() {
-//    mousePos.x = 2 * (((ui.io.MousePos.x - (ui.io.DisplaySize.x / 6) - 8) - winWidth / 2) / (winWidth));
-//    mousePos.y = -1 * ((ui.io.MousePos.y - 26) - winHeight) / (winHeight);
-//    mousePos.x = ((ui.io.MousePos.x - (ui.io.DisplaySize.x / 6) - 8) - winWidth / 2);
-//    mousePos.y = -1 * ((ui.io.MousePos.y - 26) - (winHeight/2));
     mousePos.x = ((ui.io.MousePos.x - ImGui::GetIO().DisplaySize.x / 6 - 8));
     mousePos.y = -1 * ((ui.io.MousePos.y - 26) - (winHeight));
 }

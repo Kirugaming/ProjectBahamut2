@@ -56,7 +56,7 @@ public:
 
     [[noreturn]] void engineLoop();
     void draw();
-    void clickOnBrush(vec2 mouseCoords);
+    void clickOnBrush(glm::vec3 mouseNorm);
 
     engineUI *ui;
 private:

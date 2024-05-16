@@ -12,6 +12,9 @@
 #include "Types.h"
 
 typedef struct Plane {
+    // future: incorporate vertex struct containing vertex, normal, texcoord
+    glm::vec3 normal;
+    float distance;
     std::vector<glm::vec3> vertices;
 } plane;
 
@@ -21,6 +24,7 @@ class Brush {
 public:
     int id;
     std::vector<Plane> planes;
+    std::vector<unsigned int> indices;
     size_t numVertices = 0;
     Transform transform;
     bool isSnapEnabled = true;
@@ -32,7 +36,7 @@ public:
     void draw(Shader &shader);
     void applyTransformVertices();
     void snapToWholeVerts();
-    bool checkRayIntersection(glm::vec3 rayCoords);
+    bool checkRayIntersection(glm::vec3 rayCoords, glm::vec3 rayOrigin);
 
     std::stringstream writeToString();
 };

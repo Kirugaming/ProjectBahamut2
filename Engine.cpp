@@ -150,15 +150,19 @@ void Engine::drawBrush(Brush *brush) {
 
 }
 
-void Engine::clickOnBrush(vec2 mouseCoords) {
-    glm::vec4 rayClip(mouseCoords.x, mouseCoords.y, -1.0f, 1.0f);
+void Engine::clickOnBrush(glm::vec3 mouseNorm) {
+    // 4d homogeneous clip coords
+    glm::vec4 rayClip(mouseNorm.x, mouseNorm.y, -1.0f, 1.0f);
+    // 4d camera coordinates
     glm::vec4 rayEye = glm::inverse(glm::perspective(camera.fov, ui->renderWindow.getAspectRatio(), 0.1f, 100.0f)) * rayClip;
     rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
+    // 4d world coordinates
     glm::vec3 rayWorld = glm::inverse(camera.getView()) * rayEye;
     rayWorld = glm::normalize(rayWorld);
 
-    for (int i = 0; i < map.brushList.size(); ++i) {
-//        map.brushList[i]->intersect(rayWorld);
+    for (auto & brush : map.brushList) {
+        if (brush->checkRayIntersection(rayWorld, camera.position)) {
+            std::cout << "Ray has hit the brush!" << std::endl;
+        }
     }
-
 }
