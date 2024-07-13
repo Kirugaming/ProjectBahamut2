@@ -10,6 +10,7 @@
 #include "imgui.h"
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl2.h"
+#include "imgui_internal.h"
 #include "Engine.h"
 #include "Types.h"
 #include <filesystem>
@@ -71,10 +72,13 @@ class engineUI {
         void displayFileTree(const std::string &path, int level);
         void handleFileTypes(const std::filesystem::directory_entry& file);
     };
-    ImGuiIO io;
+
+    ImGuiID dockspaceId;
+    bool firstFrame = true;
 
     void configureNextWindowPosSize(vec2 position, vec2 size);
     void initIcons();
+    void setDockSpace();
 
 public:
     Engine *engine;

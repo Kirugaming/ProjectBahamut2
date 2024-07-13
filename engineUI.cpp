@@ -11,7 +11,9 @@ engineUI::engineUI(SDL_Window *window, SDL_GLContext &glContext) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
-    io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigDockingWithShift = true;
 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, glContext);
@@ -27,20 +29,66 @@ engineUI::~engineUI() {
     ImGui::DestroyContext();
 }
 
+void engineUI::configureNextWindowPosSize(vec2 position, vec2 size) {
+    ImGui::SetNextWindowPos((ImVec2) position, ImGuiCond_Once);
+    ImGui::SetNextWindowSize((ImVec2) size, ImGuiCond_Once);
+}
+
+void engineUI::initIcons() {
+    ICONS = new std::map<std::string, Texture> {
+            {"folderClosed", Texture(R"(Assets\icons\folder-solid.png)")},
+            {"folderOpen", Texture(R"(Assets\icons\folder-open-regular.png)")},
+            {"object", Texture(R"(Assets\icons\cube-solid.png)")}
+    };
+}
+
+/**
+ * This will create the foundations and framework for a dockspace where the default positions of each window will lay
+ */
+void engineUI::setDockSpace() {
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::DockBuilderRemoveNode(dockspaceId); // imgui saves window info and it may be saved so reset to default (for now?)
+    ImGui::DockBuilderAddNode(dockspaceId,ImGuiDockNodeFlags_DockSpace);
+    ImGui::DockBuilderSetNodeSize(dockspaceId, viewport->WorkSize);
+    ImGui::DockBuilderSetNodePos(dockspaceId, viewport->WorkPos);
+
+    ImGuiID projectExplorerSpaceId = ImGui::DockBuilderSplitNode(dockspaceId, ImGuiDir_Left, 0.10f, nullptr, &dockspaceId);
+    ImGuiID objectEditorSpaceId = ImGui::DockBuilderSplitNode(dockspaceId, ImGuiDir_Right, 0.20f, nullptr, &dockspaceId);
+
+    ImGui::DockBuilderDockWindow("Main Window", dockspaceId);
+    ImGui::DockBuilderDockWindow("RenderWindow", dockspaceId);
+    ImGui::DockBuilderDockWindow("ProjectExplorer", projectExplorerSpaceId);
+    ImGui::DockBuilderDockWindow("MapExplorer", objectEditorSpaceId);
+
+    ImGui::DockBuilderFinish(dockspaceId);
+}
+
 void engineUI::renderUI() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
-    io = ImGui::GetIO();
+    // main window
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->WorkPos);
+    ImGui::SetNextWindowSize(viewport->WorkSize);
+    ImGui::SetNextWindowViewport(viewport->ID);
+    dockspaceId = ImGui::GetID("dockspace");
+    ImGui::Begin("Main Window", reinterpret_cast<bool *>(true),
+                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
+                 | ImGuiWindowFlags_NoMove| ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus);
+    ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_AutoHideTabBar);
 
     renderWindow.draw();
     fileExplorerWindow.draw();
     editWindow.draw();
 
+    if (firstFrame) {
+        setDockSpace();
+        firstFrame = false;
+    }
 
-    ImGui::ShowDemoWindow();
-
+    ImGui::End();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -49,7 +97,7 @@ void engineUI::renderUI() {
 void engineUI::FileExplorerWindow::draw() {
     ui.configureNextWindowPosSize(vec2(0, 0),
                                vec2(320, ImGui::GetIO().DisplaySize.y));
-    ImGui::Begin("Project Explorer", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+    ImGui::Begin("ProjectExplorer", reinterpret_cast<bool *>(true));
     ImGui::Text("Project Explorer");
     ImGui::Separator();
 
@@ -122,19 +170,6 @@ void engineUI::FileExplorerWindow::handleFileTypes(const std::filesystem::direct
     }
 }
 
-void engineUI::configureNextWindowPosSize(vec2 position, vec2 size) {
-    ImGui::SetNextWindowPos((ImVec2) position, ImGuiCond_Once);
-    ImGui::SetNextWindowSize((ImVec2) size, ImGuiCond_Once);
-}
-
-void engineUI::initIcons() {
-    ICONS = new std::map<std::string, Texture> {
-        {"folderClosed", Texture(R"(Assets\icons\folder-solid.png)")},
-        {"folderOpen", Texture(R"(Assets\icons\folder-open-regular.png)")},
-        {"object", Texture(R"(Assets\icons\cube-solid.png)")}
-    };
-}
-
 void engineUI::EditWindow::drawVec3Input(const std::string &inputName, glm::vec3 &vector3) {
     ImGui::Separator();
     ImGui::Text((inputName + ":").c_str());
@@ -177,7 +212,7 @@ void engineUI::EditWindow::drawGameObjectButton(std::vector<GameObject*> &gameOb
 }
 
 void engineUI::EditWindow::objectEditDraw() {
-    ImGui::Begin("Object Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+    ImGui::Begin("Object edit", reinterpret_cast<bool *>(true));
     ImGui::Text("This is the object editor window!");
 
     selectedObject->name = drawTextInput("Object Name", selectedObject->name);
@@ -212,7 +247,7 @@ void engineUI::EditWindow::objectEditDraw() {
 }
 
 void engineUI::EditWindow::brushEditDraw() {
-    ImGui::Begin("Brush Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+    ImGui::Begin("Brush Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoTitleBar);
     ImGui::Text("This is the brush editor window!");
 
     ImGui::Separator();
@@ -262,7 +297,7 @@ void engineUI::EditWindow::setSelected(Brush *brush) {
 void engineUI::EditWindow::draw() {
     ui.configureNextWindowPosSize(vec2(ImGui::GetIO().DisplaySize.x - 320, 0),
                                vec2(320, 300));
-    ImGui::Begin("Game Object Editor", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoTitleBar);
+    ImGui::Begin("MapExplorer", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoCollapse);
 
     ImGui::Text("Game Object Editor");
     ImGui::SameLine();
@@ -308,7 +343,7 @@ void engineUI::RenderWindow::draw() {
     ui.configureNextWindowPosSize(vec2(ImGui::GetIO().DisplaySize.x / 6, 0),
                                vec2(winWidth, winHeight));
 
-    ImGui::Begin("Render Window", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav);
+    ImGui::Begin("RenderWindow", reinterpret_cast<bool *>(true), ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav);
     handleResizing();
     mouseRelativeToRender();
 
@@ -368,8 +403,9 @@ void engineUI::RenderWindow::handleResizing() {
 }
 
 void engineUI::RenderWindow::mouseRelativeToRender() {
-    mousePos.x = ((ui.io.MousePos.x - ImGui::GetIO().DisplaySize.x / 6 - 8));
-    mousePos.y = -1 * ((ui.io.MousePos.y - 26) - (winHeight));
+    ImGuiIO& io = ImGui::GetIO();
+    mousePos.x = ((io.MousePos.x - ImGui::GetIO().DisplaySize.x / 6 - 8));
+    mousePos.y = -1 * ((io.MousePos.y - 26) - (winHeight));
 }
 
 float engineUI::RenderWindow::getAspectRatio() const {
