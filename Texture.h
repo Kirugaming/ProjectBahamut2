@@ -3,6 +3,9 @@
 //
 
 #include <string>
+#include "glad/glad.h"
+#include "stb_image.h"
+#include <iostream>
 
 #ifndef PROJECTBAHAMUT_TEXTURE_H
 #define PROJECTBAHAMUT_TEXTURE_H

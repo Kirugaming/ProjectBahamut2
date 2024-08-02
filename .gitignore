@@ -28,5 +28,5 @@ _deps
 /assimp/
 
 # exclude files
-glad.c
+engine/glad.c
 cmake-build-debug/lib/stb/stb_image.h

@@ -2,10 +2,8 @@
 // Created by kirut on 10/25/2023.
 //
 
-#include <iostream>
 #include "Texture.h"
-#include "glad/glad.h"
-#include "stb_image.h"
+
 
 Texture::Texture(const char* filePath) {
     path = filePath;

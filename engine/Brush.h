@@ -9,7 +9,7 @@
 #include "Shader.h"
 #include "Mesh.h"
 #include "yaml-cpp/node/node.h"
-#include "Types.h"
+#include "../Types.h"
 
 typedef struct Plane {
     // future: incorporate vertex struct containing vertex, normal, texcoord

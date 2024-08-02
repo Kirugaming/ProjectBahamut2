@@ -14,17 +14,8 @@
 #include "SDL.h"
 #include "imgui.h"
 #include "Map.h"
-#include "engineUI.h"
-#include "Projects.h"
 #include "InputManager.h"
 #include "Brush.h"
-
-class engineUI;
-
-static struct WindowSize {
-    int height;
-    int width;
-} windowSize;
 
 struct DeltaTime {
     void update() {
@@ -45,35 +36,22 @@ private:
 
 class Engine {
 public:
-    SDL_Window *window = nullptr;
-    SDL_GLContext glContext = nullptr;
-    WindowSize windowSize;
-    Project project;
     Map map;
 
-    Engine(Project &chosenProject);
+    Engine();
     ~Engine();
 
-    [[noreturn]] void engineLoop();
     void draw();
     void clickOnBrush(glm::vec3 mouseNorm);
+    void setAspectRatio(float inAspectRatio);
 
-    engineUI *ui;
 private:
-    SDL_DisplayMode displayMode;
-    SDL_Event event;
     InputManager &inputManager = InputManager::getInstance();
-    bool quit = false;
     DeltaTime deltaTime;
     Shader *baseShader;
+    float aspectRatio = 0;
     Camera camera = Camera(glm::vec3(0.0f, 0.0f, 2.0f));
 
-
-
-
-    int initRendering(int winHeight, int winWidth); // SDL and OpenGL
-    void eventMonitor();
-    void KeyboardInput();
     void drawBrush(Brush *brush);
     void drawGameObjects(const std::vector<GameObject*>& gameObjects) const;
 };

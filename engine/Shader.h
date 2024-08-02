@@ -8,7 +8,7 @@
 #include "glad/glad.h"
 #include "glm/detail/type_mat4x4.hpp"
 #include "glm/fwd.hpp"
-#include <glm/gtc/type_ptr.hpp>
+#include "glm/gtc/type_ptr.hpp"
 #include <fstream>
 #include <sstream>
 #include <iostream>

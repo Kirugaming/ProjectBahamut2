@@ -3,37 +3,8 @@
 //
 
 #include "main.h"
-#include "GameObject.h"
-#include "Projects.h"
-
-
-// SDL Rendering is for Engine UI,
-// OpenGL is for game rendering and game ui and what not
+#include "ui/MainWindow.h"
 
 int main(int argc, char *argv[]) {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        std::cout << "SDL FAILED TO INITIALIZE!\n " << SDL_GetError() << std::endl;
-        return -1;
-    }
-
-    auto* projects = new ProjectsWindow();
-    projects->renderLoop();
-    if (projects->selectedProject == nullptr) {
-        delete projects;
-        return 0; // closed without selecting anything
-    }
-    Project chosenProject = *projects->selectedProject;
-
-    delete projects;
-
-
-    Engine engine(chosenProject);
-    engineUI ui(engine.window, engine.glContext);
-
-    engine.ui = &ui; // ui and engine need to know stuff from each other
-    ui.engine = &engine;
-
-    engine.engineLoop();
-
-    return 0;
+    MainWindow ui;
 }

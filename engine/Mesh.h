@@ -10,7 +10,7 @@
 #include "glm/vec3.hpp"
 #include "glm/vec2.hpp"
 #include "Shader.h"
-#include "Texture.h"
+#include "../Texture.h"
 
 
 
