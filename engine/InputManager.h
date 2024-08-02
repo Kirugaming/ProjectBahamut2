@@ -9,14 +9,10 @@
 #include "SDL2/SDL.h"
 #include <unordered_map>
 
-enum Inputs {
-};
-
 class InputManager {
-public:
     std::unordered_map<std::string, SDL_Scancode> keyMap;
     const Uint8 *keys = SDL_GetKeyboardState(nullptr);
-
+public:
     InputManager();
 
     static InputManager& getInstance() {

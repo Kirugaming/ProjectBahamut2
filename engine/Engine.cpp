@@ -18,7 +18,8 @@ Engine::Engine() {
 Engine::~Engine() = default;
 
 void Engine::draw() {
-//    deltaTime.update(); TODO*
+    deltaTime.update();
+    checkInputs();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glClearColor(.2f, .3f, .3f, 1.0f);
@@ -31,8 +32,6 @@ void Engine::draw() {
     drawGameObjects(map.gameObjects);
 
     baseShader->unUse();
-
-
 }
 
 void Engine::drawGameObjects(const std::vector<GameObject*>& gameObjects) const {
@@ -75,5 +74,32 @@ void Engine::clickOnBrush(glm::vec3 mouseNorm) {
 
 void Engine::setAspectRatio(float inAspectRatio) {
     this->aspectRatio = inAspectRatio;
+}
+
+void Engine::checkInputs() {
+    if (inputManager.getKeyDown("w")) {
+        camera.movement(Camera::FORWARD, deltaTime.get());
+    }
+    if (inputManager.getKeyDown("a")) {
+        camera.movement(Camera::LEFT, deltaTime.get());
+    }
+    if (inputManager.getKeyDown("s")) {
+        camera.movement(Camera::BACKWARD, deltaTime.get());
+    }
+    if (inputManager.getKeyDown("d")) {
+        camera.movement(Camera::RIGHT, deltaTime.get());
+    }
+    if (inputManager.getKeyDown("up")) {
+        camera.setPitch(1);
+    }
+    if (inputManager.getKeyDown("down")) {
+        camera.setPitch(-1);
+    }
+    if (inputManager.getKeyDown("left")) {
+        camera.setYaw(-1);
+    }
+    if (inputManager.getKeyDown("right")) {
+        camera.setYaw(1);
+    }
 }
 

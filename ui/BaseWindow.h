@@ -9,14 +9,15 @@
 #include "../engine/Engine.h"
 
 struct WinSize {
-    int height;
-    int width;
+    float width;
+    float height;
 };
 
 class BaseWindow {
 
 protected:
     bool quit = false;
+    WinSize size = WinSize(0,0);
 
     virtual void draw() = 0;
 };

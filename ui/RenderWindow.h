@@ -10,18 +10,13 @@
 class RenderWindow : public BaseImGuiWindow {
     unsigned int FBO{};
     unsigned int renderTextureId{};
-    bool firstFrame = true;
-
-    void handleResizing();
-    void mouseRelativeToRender();
 
 protected:
     void draw() override;
-
+    void createFrameBuffer();
 public:
     explicit RenderWindow();
 
-    float getAspectRatio() const;
 };
 
 

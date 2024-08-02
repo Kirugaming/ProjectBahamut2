@@ -19,19 +19,15 @@
 
 struct DeltaTime {
     void update() {
-        currentFrame = (float) SDL_GetPerformanceCounter();
-        deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+        currentFrame = (float) SDL_GetPerformanceCounter();
     }
-
     [[nodiscard]] float get() const {
-        return deltaTime;
+        return currentFrame - lastFrame;
     }
-
 private:
     float lastFrame = 0.0f;
     float currentFrame = 0.0f;
-    float deltaTime = 0.0f;
 };
 
 class Engine {
@@ -44,7 +40,6 @@ public:
     void draw();
     void clickOnBrush(glm::vec3 mouseNorm);
     void setAspectRatio(float inAspectRatio);
-
 private:
     InputManager &inputManager = InputManager::getInstance();
     DeltaTime deltaTime;
@@ -54,6 +49,7 @@ private:
 
     void drawBrush(Brush *brush);
     void drawGameObjects(const std::vector<GameObject*>& gameObjects) const;
+    void checkInputs();
 };
 
 

@@ -26,7 +26,7 @@ protected:
     static ImGuiViewport* viewport;
 
     BaseImGuiWindow();
-
+    bool hasBeenResized();
 public:
     void draw() override{};
     static void startImGui(SDL_Window* sdlWindow, SDL_GLContext glContext);

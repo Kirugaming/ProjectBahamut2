@@ -48,3 +48,18 @@ void BaseImGuiWindow::shutdownImGui() {
         throw std::exception();
     }
 }
+
+bool BaseImGuiWindow::hasBeenResized() {
+    ImVec2 imGuiSize = ImGui::GetContentRegionAvail();
+
+    if (imGuiSize.x != size.width || imGuiSize.y != size.height) {
+        if (imGuiSize.x == 0 || imGuiSize.y == 0) {
+            return false; // collapsed
+        }
+        size.height = imGuiSize.y;
+        size.width = imGuiSize.x;
+
+        return true;
+    }
+    return false;
+}
