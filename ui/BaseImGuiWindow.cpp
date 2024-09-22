@@ -22,7 +22,7 @@ void BaseImGuiWindow::startImGui(SDL_Window *sdlWindow, SDL_GLContext glContext)
         ImGui::CreateContext();
 
         ImGuiIO& io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         io.ConfigDockingWithShift = true;
 
         ImGui_ImplSDL2_InitForOpenGL(sdlWindow, glContext);

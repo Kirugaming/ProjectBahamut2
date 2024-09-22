@@ -74,7 +74,7 @@ Brush *Map::addBrush(std::ifstream &mapFile, std::string &fileLine) {
             iss >> x;
             iss >> y;
             iss >> z;
-            newVertex.normals = glm::vec3(x, y, z);
+//            newVertex.normals = glm::vec3(x, y, z);
             // tex coords
             iss >> x;
             iss >> y;

@@ -4,7 +4,7 @@ out vec4 fragColor;
 in vec2 texCoords;
 
 uniform sampler2D texture_diffuse1;
-uniform vec3 colors;
+uniform vec3 colors = vec3(1.0f, 1.0f, 1.0f);
 
 void main()
 {
@@ -14,5 +14,5 @@ void main()
 //        fragColor = vec4(colors, 1.0);
 //    }
 
-    fragColor = vec4(1.0f);
+    fragColor = vec4(colors, 1.0f);
 }

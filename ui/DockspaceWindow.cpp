@@ -13,7 +13,7 @@
 DockspaceWindow::DockspaceWindow() {
 
     windows.push_back(new RenderWindow());
-    windows.push_back(new MapExplorerWindow());
+//    windows.push_back(new MapExplorerWindow());
 
     DockspaceWindow::draw();
 }
@@ -64,10 +64,10 @@ void DockspaceWindow::draw() {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    // multiple viewport
-    SDL_Window* currentWindow = SDL_GL_GetCurrentWindow();
-    SDL_GLContext currentContext = SDL_GL_GetCurrentContext();
-    ImGui::UpdatePlatformWindows();
-    ImGui::RenderPlatformWindowsDefault();
-    SDL_GL_MakeCurrent(currentWindow, currentContext);
+//    // multiple viewport
+//    SDL_Window* currentWindow = SDL_GL_GetCurrentWindow();
+//    SDL_GLContext currentContext = SDL_GL_GetCurrentContext();
+//    ImGui::UpdatePlatformWindows();
+//    ImGui::RenderPlatformWindowsDefault();
+//    SDL_GL_MakeCurrent(currentWindow, currentContext);
 }

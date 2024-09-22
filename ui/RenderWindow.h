@@ -11,6 +11,8 @@ class RenderWindow : public BaseImGuiWindow {
     unsigned int FBO{};
     unsigned int renderTextureId{};
 
+    void pollEvents();
+
 protected:
     void draw() override;
     void createFrameBuffer();

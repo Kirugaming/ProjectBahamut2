@@ -32,6 +32,10 @@ set(SOURCE_FILES
         Texture.h
         Types.cpp
         Types.h
+        engine/BaseDrawable.cpp
+        engine/BaseDrawable.h
+        engine/Line.cpp
+        engine/Line.h
 )
 
 file(GLOB SOURCE_FILES

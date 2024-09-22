@@ -5,6 +5,7 @@
 #include "Engine.h"
 #include "backends/imgui_impl_sdl2.h"
 #include "backends/imgui_impl_opengl3.h"
+#include "Line.h"
 
 
 Engine::Engine() {
@@ -26,10 +27,13 @@ void Engine::draw() {
 
     baseShader->use();
 
-    for (Brush *brush: map.brushList) {
-        drawBrush(brush);
+    baseShader->editShaderWithMat4("view", camera.getView());
+    baseShader->editShaderWithMat4("perspective", glm::perspective(camera.fov, aspectRatio, 0.1f, 100.0f));
+    test.draw(*baseShader);
+
+    for (BaseDrawable *drawable : drawables) {
+        drawable->draw(*baseShader);
     }
-    drawGameObjects(map.gameObjects);
 
     baseShader->unUse();
 }
@@ -52,24 +56,6 @@ void Engine::drawBrush(Brush *brush) {
     baseShader->editShaderWithMat4("view", camera.getView());
     baseShader->editShaderWithMat4("perspective", glm::perspective(camera.fov, aspectRatio, 0.1f, 100.0f));
     brush->draw(*baseShader);
-
-}
-
-void Engine::clickOnBrush(glm::vec3 mouseNorm) {
-    // 4d homogeneous clip coords
-    glm::vec4 rayClip(mouseNorm.x, mouseNorm.y, -1.0f, 1.0f);
-    // 4d camera coordinates
-    glm::vec4 rayEye = glm::inverse(glm::perspective(camera.fov, aspectRatio, 0.1f, 100.0f)) * rayClip;
-    rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
-    // 4d world coordinates
-    glm::vec3 rayWorld = glm::inverse(camera.getView()) * rayEye;
-    rayWorld = glm::normalize(rayWorld);
-
-    for (auto & brush : map.brushList) {
-        if (brush->checkRayIntersection(rayWorld, camera.position)) {
-            std::cout << "Ray has hit the brush!" << std::endl;
-        }
-    }
 }
 
 void Engine::setAspectRatio(float inAspectRatio) {
@@ -100,6 +86,23 @@ void Engine::checkInputs() {
     }
     if (inputManager.getKeyDown("right")) {
         camera.setYaw(1);
+    }
+}
+
+void Engine::createRay(glm::vec3 normMousePos) {
+    // 4d homogeneous clip coords
+    glm::vec4 rayClip(normMousePos.x, normMousePos.y, -1.0f, 1.0f);
+    // 4d camera coordinates
+    glm::vec4 rayEye = glm::inverse(glm::perspective(camera.fov, aspectRatio, 0.1f, 100.0f)) * rayClip;
+    rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
+    // 4d world coordinates
+    glm::vec3 rayWorld = glm::normalize(glm::inverse(camera.getView()) * rayEye);
+
+    drawables.push_back(new Line(camera.position, camera.position + rayWorld * 100.0f));
+
+    if (test.isAABBIntersect(camera.position, rayWorld)) {
+        std::cout << "I hit something at " << rayWorld.x << " " << rayWorld.y << " " << rayWorld.z << "!" << std::endl;
+
     }
 }
 

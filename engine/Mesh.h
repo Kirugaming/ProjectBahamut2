@@ -11,12 +11,12 @@
 #include "glm/vec2.hpp"
 #include "Shader.h"
 #include "../Texture.h"
-
+#include "BaseDrawable.h"
 
 
 struct Vertex {
     glm::vec3 position;
-    glm::vec3 normals;
+    glm::vec3 normal;
     glm::vec2 texCoords;
 };
 
@@ -32,20 +32,30 @@ struct MeshTexture { // to be changed later
     std::string type;
 };
 
-class Mesh {
-public:
+class Mesh : private BaseDrawable {
+    unsigned int VAO{}, VBO{}, EBO{};
     std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
-    std::vector<MeshTexture> textures;
-    Color colors;
+    std::vector<unsigned int> indices; // defining the triangles
 
+    void setupMesh();
+
+public:
+    enum InitialShape {
+        Cube,
+        Cylinder,
+    };
+
+    std::vector<MeshTexture> textures;
+    Color colors = {{0, 0, 0}};
+
+    /*
+     * For creating simple convex hull shapes like cube and cylinder
+     */
+    Mesh();
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<MeshTexture> textures, Color colors);
 
-    virtual void draw(Shader &shader);
-protected:
-    unsigned int VAO{}, VBO{}, EBO{};
-private:
-    void setupMesh();
+    void draw(Shader &shader) override;
+    bool isAABBIntersect(glm::vec3 rayOrigin, glm::vec3 rayDir);
 };
 
 

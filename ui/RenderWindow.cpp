@@ -6,21 +6,43 @@
 
 RenderWindow::RenderWindow() {
     winFlags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav;
-
     engine = new Engine();
-    engine->setAspectRatio(16/9);
 }
 
 void RenderWindow::draw() {
     ImGui::Begin("RenderWindow", reinterpret_cast<bool *>(quit), winFlags);
-    if (hasBeenResized()) {
-        createFrameBuffer();
-    }
+    pollEvents();
+
+    // Get the global mouse position
+    ImVec2 mousePos = ImGui::GetMousePos();
+
+    // Get the position of the current viewport
+    ImVec2 viewportPos = ImGui::GetWindowViewport()->Pos;
+
+    // Calculate the relative mouse position within the window
+    // This is manual offset until i figure why its so off without it
+    ImVec2 mouseRelative = ImVec2(mousePos.x, size.height - mousePos.y + 30);
+
+
+    ImGui::Begin("Test");
+    ImGui::Text("Mouse Position Relative: (%.1f, %.1f)", mouseRelative.x, mouseRelative.y);
+    ImGui::End();
+
+    ImGui::ShowDemoWindow();
 
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
     engine->draw();
     ImGui::Image((void*)(intptr_t) renderTextureId, ImGui::GetContentRegionAvail());
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    ImGui::SetCursorPos(ImVec2(0,0)); // puts it over last element
+    if (ImGui::InvisibleButton("RenderWindowButton", ImVec2(size.width, size.height))) {
+        engine->createRay({ // normalize
+          (2.0f * mouseRelative.x) / size.width - 1.0f,
+          1.0f - (2.0f * mouseRelative.y) / size.height,
+          1.0f
+        });
+    }
+
 
     ImGui::End();
 }
@@ -43,4 +65,11 @@ void RenderWindow::createFrameBuffer() {
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void RenderWindow::pollEvents() {
+    if (hasBeenResized()) {
+        createFrameBuffer();
+        engine->setAspectRatio(size.width / size.height);
+    }
 }
