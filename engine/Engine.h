@@ -16,6 +16,7 @@
 #include "Map.h"
 #include "InputManager.h"
 #include "Brush.h"
+#include "Line.h"
 
 struct DeltaTime {
     void update() {
@@ -52,6 +53,7 @@ private:
     void drawBrush(Brush *brush);
     void drawGameObjects(const std::vector<GameObject*>& gameObjects) const;
     void checkInputs();
+    static Line* createGrid();
 };
 
 

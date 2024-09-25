@@ -21,22 +21,6 @@ set(IMGUI_SOURCES lib/imgui/imgui.cpp
 include_directories(lib/imgui)
 
 # Must set the path to the main.cpp, for example: scripts/main.cpp if it is inside a folder
-set(SOURCE_FILES
-        engine
-        ui
-        engine/Engine.cpp
-        engine/Engine.h
-        main.cpp
-        main.h
-        Texture.cpp
-        Texture.h
-        Types.cpp
-        Types.h
-        engine/BaseDrawable.cpp
-        engine/BaseDrawable.h
-        engine/Line.cpp
-        engine/Line.h
-)
 
 file(GLOB SOURCE_FILES
         ${CMAKE_SOURCE_DIR}/*.cpp
@@ -49,6 +33,9 @@ file(GLOB SOURCE_FILES
 
 set(LIB_FILES engine/glad.c)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${LIB_FILES} ${IMGUI_SOURCES})
+
+target_compile_options(${PROJECT_NAME} PRIVATE -pthread)
+target_link_options(${PROJECT_NAME} PRIVATE -pthread)
 
 
 # include libraries with the project

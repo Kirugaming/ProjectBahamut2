@@ -20,6 +20,21 @@ struct Vertex {
     glm::vec2 texCoords;
 };
 
+struct Edge {
+    glm::vec3 vertices[2];
+    glm::vec3 position;
+
+    Edge(glm::vec3 &vert1, glm::vec3 &vert2) : vertices(vert1, vert2) {
+        position = (vert1 + vert2) / 2.0f;
+    }
+};
+
+struct Face {
+    glm::vec3 vertices[3];
+    glm::vec3 position;
+    
+};
+
 struct Color {
     glm::vec3 diffuse;
 //    glm::vec3 ambient;

@@ -85,7 +85,7 @@ void Mesh::draw(Shader &shader) {
     // Currently Models must have textures to use colors
     glm::vec3 finalColor = colors.diffuse; // we only need diffuse for now
 //    shader.editShaderWithVec3("colors", finalColor);
-    shader.editShaderWithVec3("colors", glm::vec3(1.0f, 1.0f, 1.0f));
+//    shader.setVec3("colors", glm::vec3(1.0f, 1.0f, 1.0f));
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);

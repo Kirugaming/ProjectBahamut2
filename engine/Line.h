@@ -13,10 +13,11 @@
 class Line : public BaseDrawable {
     unsigned int VAO{}, VBO{};
     std::vector<glm::vec3> vertices;
-    // color
+    glm::vec3 color;
 
 public:
-    Line(glm::vec3 start, glm::vec3 end);
+    Line(glm::vec3 start, glm::vec3 end, glm::vec3 color);
+    Line(std::vector<glm::vec3> vertices, glm::vec3 color);
 
     void draw(Shader &shader) override;
 };

@@ -40,7 +40,7 @@ Brush::Brush() {
 //}
 
 void Brush::draw(Shader &shader) {
-    shader.editShaderWithMat4("model", transform.toMat4());
+    shader.setMat4("model", transform.toMat4());
 
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, numVertices);

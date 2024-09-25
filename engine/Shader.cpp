@@ -73,15 +73,14 @@ void Shader::unUse() const {
 }
 
 
-void Shader::setInt(const std::string &name, int value) const
-{
+void Shader::setInt(const std::string &name, int value) const {
     glUniform1i(glGetUniformLocation(this->programId, name.c_str()), value);
 }
-void Shader::editShaderWithMat4(const char *uniformName, glm::mat4 matrix) const {
+void Shader::setMat4(const char *uniformName, glm::mat4 matrix) const {
     glUniformMatrix4fv(glGetUniformLocation(this->programId, uniformName), 1, GL_FALSE, glm::value_ptr(matrix));
 }
-void Shader::editShaderWithVec3(const char *uniformName, glm::vec3 colors) const {
-    glUniform3fv(glGetUniformLocation(this->programId,uniformName),1,glm::value_ptr(colors));
+void Shader::setVec3(const char *uniformName, glm::vec3 vec3) const {
+    glUniform3fv(glGetUniformLocation(this->programId,uniformName), 1, glm::value_ptr(vec3));
 }
 
 void Shader::getShaderProgramLinkInfoLog(unsigned int shaderProgramID) {
@@ -103,8 +102,3 @@ void Shader::getShaderCompileInfoLog(unsigned int shaderID) {
         std::cout << "Shader failed to compile! - " << infoLog << std::endl;
     }
 }
-
-void Shader::editShaderWithVec4(const char *uniformName, glm::vec4 &colors) const {
-    glUniform4fv(glGetUniformLocation(this->programId,uniformName),1,glm::value_ptr(colors));
-}
-

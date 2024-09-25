@@ -14,6 +14,8 @@ Engine::Engine() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glEnable(GL_DEBUG_OUTPUT);
+
+    drawables.push_back(createGrid());
 }
 
 Engine::~Engine() = default;
@@ -27,13 +29,16 @@ void Engine::draw() {
 
     baseShader->use();
 
-    baseShader->editShaderWithMat4("view", camera.getView());
-    baseShader->editShaderWithMat4("perspective", glm::perspective(camera.fov, aspectRatio, 0.1f, 100.0f));
-    test.draw(*baseShader);
+    baseShader->setMat4("view", camera.getView());
+    baseShader->setMat4("perspective", glm::perspective(camera.fov, aspectRatio, 0.1f, 100.0f));
 
     for (BaseDrawable *drawable : drawables) {
         drawable->draw(*baseShader);
     }
+
+
+    baseShader->setVec3("colors", glm::vec3(1.0f));
+    test.draw(*baseShader);
 
     baseShader->unUse();
 }
@@ -44,8 +49,8 @@ void Engine::drawGameObjects(const std::vector<GameObject*>& gameObjects) const 
             script->run();
         }
 
-        baseShader->editShaderWithMat4("view", camera.getView());
-        baseShader->editShaderWithMat4("perspective", glm::perspective(camera.fov, aspectRatio, 0.1f, 100.0f));
+        baseShader->setMat4("view", camera.getView());
+        baseShader->setMat4("perspective", glm::perspective(camera.fov, aspectRatio, 0.1f, 100.0f));
         model->draw(*baseShader);
 
         drawGameObjects(model->nestedGameObjects);
@@ -53,8 +58,8 @@ void Engine::drawGameObjects(const std::vector<GameObject*>& gameObjects) const 
 }
 
 void Engine::drawBrush(Brush *brush) {
-    baseShader->editShaderWithMat4("view", camera.getView());
-    baseShader->editShaderWithMat4("perspective", glm::perspective(camera.fov, aspectRatio, 0.1f, 100.0f));
+    baseShader->setMat4("view", camera.getView());
+    baseShader->setMat4("perspective", glm::perspective(camera.fov, aspectRatio, 0.1f, 100.0f));
     brush->draw(*baseShader);
 }
 
@@ -98,11 +103,24 @@ void Engine::createRay(glm::vec3 normMousePos) {
     // 4d world coordinates
     glm::vec3 rayWorld = glm::normalize(glm::inverse(camera.getView()) * rayEye);
 
-    drawables.push_back(new Line(camera.position, camera.position + rayWorld * 100.0f));
-
     if (test.isAABBIntersect(camera.position, rayWorld)) {
-        std::cout << "I hit something at " << rayWorld.x << " " << rayWorld.y << " " << rayWorld.z << "!" << std::endl;
 
     }
+}
+
+Line* Engine::createGrid() {
+    std::vector<glm::vec3> vertices;
+    const int gridSize = 100;
+
+    for (int i = -gridSize; i < gridSize; ++i) {
+        // vertical
+        vertices.emplace_back(i, 0.0f, -gridSize);
+        vertices.emplace_back(i, 0.0f, gridSize);
+        // horizontal
+        vertices.emplace_back(-gridSize, 0.0f, i);
+        vertices.emplace_back(gridSize, 0.0f, i);
+    }
+
+    return new Line(vertices, glm::vec3(0.75f));
 }
 
