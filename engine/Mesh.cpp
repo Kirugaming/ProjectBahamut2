@@ -54,11 +54,9 @@ Mesh::Mesh() {
     glBindVertexArray(0);
 }
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<MeshTexture> textures, Color colors) {
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) {
     this->vertices = std::move(vertices);
     this->indices = std::move(indices);
-    this->textures = std::move(textures);
-    this->colors = colors;
 
     setupMesh();
 }

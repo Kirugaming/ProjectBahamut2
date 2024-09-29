@@ -21,3 +21,6 @@
 [submodule "lib/lua"]
 	path = lib/lua
 	url = https://github.com/walterschell/Lua
+[submodule "lib/json"]
+	path = lib/json
+	url = https://github.com/nlohmann/json.git

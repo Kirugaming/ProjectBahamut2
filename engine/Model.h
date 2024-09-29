@@ -7,6 +7,7 @@
 
 
 #include <vector>
+#include <filesystem>
 #include "Shader.h"
 #include "Mesh.h"
 #include "../Types.h"
@@ -14,6 +15,9 @@
 #include "assimp/scene.h"
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
+#include "../AssetImporters/BaseModelImporter.h"
+#include "../AssetImporters/glTFImporter.h"
+
 
 class Model {
 public:
@@ -40,6 +44,21 @@ private:
 
     std::vector<Texture> textures_loaded;
 };
+
+// Supports glTF (eventually usd)
+static Model modelImport(const std::string &path) {
+    std::string fileType = std::filesystem::path("path").extension().string();
+    std::ifstream fileStream(path);
+
+    BaseModelImporter modelImporter;
+    if (fileType == "gltf") {
+        modelImporter = glTF::Importer(fileStream, glTF::Json);
+    } else if (fileType == "glb") {
+        modelImporter = glTF::Importer(fileStream, glTF::Binary);
+    }
+
+    return Model(nullptr);
+}
 
 
 #endif //PROJECTBAHAMUT_MODEL_H

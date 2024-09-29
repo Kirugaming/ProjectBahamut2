@@ -1,0 +1,14 @@
+//
+// Created by kirut on 9/24/2024.
+//
+
+#ifndef PROJECTBAHAMUT_BASEMODELIMPORTER_H
+#define PROJECTBAHAMUT_BASEMODELIMPORTER_H
+
+
+class BaseModelImporter {
+
+};
+
+
+#endif //PROJECTBAHAMUT_BASEMODELIMPORTER_H

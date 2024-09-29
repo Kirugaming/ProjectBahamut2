@@ -25,10 +25,13 @@ include_directories(lib/imgui)
 file(GLOB SOURCE_FILES
         ${CMAKE_SOURCE_DIR}/*.cpp
         ${CMAKE_SOURCE_DIR}/*.h
+        ${CMAKE_SOURCE_DIR}/*.ixx
         ${CMAKE_SOURCE_DIR}/ui/*.cpp
         ${CMAKE_SOURCE_DIR}/ui/*.h
         ${CMAKE_SOURCE_DIR}/engine/*.cpp
         ${CMAKE_SOURCE_DIR}/engine/*.h
+        ${CMAKE_SOURCE_DIR}/AssetImporters/*.cpp
+        ${CMAKE_SOURCE_DIR}/AssetImporters/*.h
 )
 
 set(LIB_FILES engine/glad.c)
@@ -69,6 +72,10 @@ target_link_libraries(${PROJECT_NAME} lua)
 # sol2
 add_subdirectory("lib/sol2")
 target_link_libraries(${PROJECT_NAME} sol2)
+
+# json
+add_subdirectory("lib/json")
+target_link_libraries(${PROJECT_NAME} nlohmann_json::nlohmann_json)
 
 
 # Copy Needed DLLs to build
